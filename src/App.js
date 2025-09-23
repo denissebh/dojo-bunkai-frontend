@@ -1,24 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+// Importa tus componentes de Layout
+import Header from './layouts/Header';
+import Footer from './layouts/Footer';
+
+// Importa tus componentes de Página
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegistroPage from './pages/RegistroPage'; 
+import RenadePage from './pages/RenadePage';    
+import CalendarioPage from './pages/CalendarioPage'; 
+import UbicacionPage from './pages/UbicacionPage';   
+import SobreNosotrosPage from './pages/SobreNosotrosPage'; 
+import AdminDashboardPage from './pages/AdminDashboardPage';  
+import ProfesorDashboardPage from './pages/ProfesorDashboardPage';     
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/registro" element={<RegistroPage />} />
+            <Route path="/renade" element={<RenadePage />} />
+            <Route path="/calendario" element={<CalendarioPage />} /> 
+            <Route path="/ubicacion" element={<UbicacionPage />} />   
+            <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} /> 
+            <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+            <Route path="/profesor/dashboard" element={<ProfesorDashboardPage />} />          
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
