@@ -1,6 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function AdminSidebar({ activeView, onSelectView }) {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    // En una app real, aquí limpiarías el estado de autenticación
+    navigate('/login');
+  };
   return (
     <aside className="admin-sidebar">
       <nav>
@@ -44,6 +50,9 @@ function AdminSidebar({ activeView, onSelectView }) {
             >
               Editar Perfiles
             </button>
+            <button onClick={handleLogout} className="logout-btn">
+        Cerrar Sesión
+      </button>
           </li>
         </ul>
       </nav>
