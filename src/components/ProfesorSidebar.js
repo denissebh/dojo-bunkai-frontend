@@ -37,6 +37,14 @@ function ProfesorSidebar({ activeView, onSelectView }) {
               Comunicados
             </button>
           </li>
+          <li>
+            <button
+              className={`sidebar-btn ${activeView === 'renade' ? 'active' : ''}`}
+              onClick={() => onSelectView('renade')}
+            >
+              Solicitud RENADE
+            </button>
+          </li>
         </ul>
       </nav>
     </aside>

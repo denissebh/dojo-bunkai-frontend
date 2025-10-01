@@ -16,14 +16,6 @@ function Header() {
             Inicio
           </NavLink>
           <NavLink 
-             to="/renade" // <-- MODIFICA ESTA LÍNEA
-             style={({ isActive }) => ({
-             color: isActive ? '#c0392b' : '#333',
-             })}
-          >
-            RENADE
-          </NavLink>
-          <NavLink 
             to="/login"
             style={({ isActive }) => ({
               color: isActive ? '#c0392b' : '#333',

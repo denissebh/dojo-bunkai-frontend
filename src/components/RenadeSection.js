@@ -10,7 +10,7 @@ const UserIcon = () => (
 );
 
 
-function RenadePage() {
+function RenadeSection() {
   // Estado para guardar los archivos seleccionados
   const [curpDocument, setCurpDocument] = useState(null);
   const [photo, setPhoto] = useState(null);
@@ -79,4 +79,4 @@ function RenadePage() {
   );
 }
 
-export default RenadePage;
+export default RenadeSection;

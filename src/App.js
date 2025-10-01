@@ -9,12 +9,13 @@ import Footer from './layouts/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegistroPage from './pages/RegistroPage'; 
-import RenadePage from './pages/RenadePage';    
+import RenadePage from './components/RenadeSection';    
 import CalendarioPage from './pages/CalendarioPage'; 
 import UbicacionPage from './pages/UbicacionPage';   
 import SobreNosotrosPage from './pages/SobreNosotrosPage'; 
 import AdminDashboardPage from './pages/AdminDashboardPage';  
-import ProfesorDashboardPage from './pages/ProfesorDashboardPage';     
+import ProfesorDashboardPage from './pages/ProfesorDashboardPage';    
+import AlumnoDashboardPage from './pages/AlumnoDashboardPage'; 
 
 function App() {
   return (
@@ -26,14 +27,13 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/registro" element={<RegistroPage />} />
-            <Route path="/renade" element={<RenadePage />} />
             <Route path="/calendario" element={<CalendarioPage />} /> 
             <Route path="/ubicacion" element={<UbicacionPage />} />   
             <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} /> 
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-            <Route path="/profesor/dashboard" element={<ProfesorDashboardPage />} />          
-          </Routes>
-        </main>
+            <Route path="/profesor/dashboard" element={<ProfesorDashboardPage />} />   
+            <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />        
+          </Routes>        </main>
         <Footer />
       </div>
     </BrowserRouter>

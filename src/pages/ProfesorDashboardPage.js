@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ProfesorSidebar from '../components/ProfesorSidebar';
 import ListaAlumnos from '../components/ListaAlumnos';
+import RenadeSection from '../components/RenadeSection';
 
 function ProfesorDashboardPage() {
   const [activeView, setActiveView] = useState('listaAlumnos');
@@ -9,6 +10,8 @@ function ProfesorDashboardPage() {
     switch (activeView) {
       case 'listaAlumnos':
         return <ListaAlumnos />;
+      case 'renade': 
+        return <RenadeSection />;
       // Aquí añadiremos los otros componentes en el futuro
       case 'misEstadisticas':
         return <h3>Mis Estadísticas (En construcción)</h3>;
