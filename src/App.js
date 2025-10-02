@@ -1,7 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Importa los nuevos Layouts
+// Importa los componentes globales
+import Header from './layouts/Header';
+import Footer from './layouts/Footer';
+
+// Importa los Layouts de ruta
 import PublicLayout from './layouts/PublicLayout';
 import PrivateLayout from './layouts/PrivateLayout';
 
@@ -19,8 +23,11 @@ import AlumnoDashboardPage from './pages/AlumnoDashboardPage';
 function App() {
   return (
     <BrowserRouter>
+      {/* Header y Footer ahora están fuera de las rutas, por lo que siempre serán visibles */}
+      <Header />
+
       <Routes>
-        {/* --- RUTAS PÚBLICAS --- */}
+        {/* Rutas Públicas */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -30,15 +37,15 @@ function App() {
           <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
         </Route>
 
-        {/* --- RUTAS PRIVADAS --- */}
+        {/* Rutas Privadas */}
         <Route element={<PrivateLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/profesor/dashboard" element={<ProfesorDashboardPage />} />
           <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />
-          {/* Nota: La página de perfil de alumno vista por el profesor ya no es necesaria con esta estructura,
-              pero si la necesitas, también iría aquí. */}
         </Route>
       </Routes>
+
+      <Footer />
     </BrowserRouter>
   );
 }

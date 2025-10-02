@@ -1,9 +1,9 @@
 import React from 'react';
-import userAvatar from '../assets/images/Kyoshi1.jpeg'; // Usaremos una imagen de ejemplo
+import userAvatar from '../assets/images/alumno.jpg'; 
 import { useNavigate } from 'react-router-dom'; 
 // Ahora recibe los datos del alumno como props
 function AlumnoSidebar({ alumno, activeView, onSelectView }) {
-  const navigate = useNavigate(); // <-- INICIALIZA useNavigate
+  const navigate = useNavigate(); 
 
   const handleLogout = () => {
     navigate('/login');

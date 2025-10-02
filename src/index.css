@@ -1,7 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
-/* --- Estilos Generales --- */
+/* --- FUENTES DE GOOGLE --- */
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;600;700&display=swap');
+
+/* --- ESTILOS GENERALES --- */
 body {
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   background-color: #f9f9f9;
   color: #333;
@@ -13,7 +15,19 @@ body {
   margin: 0 auto;
 }
 
-/* --- Header y Navegación --- */
+/* --- LAYOUTS PÚBLICO Y PRIVADO --- */
+.public-layout main {
+  background-color: #fff; 
+}
+
+.private-layout {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(to bottom, #fcecec 0%, #ffffff 70%); 
+}
+
+/* --- HEADER Y NAVEGACIÓN PRINCIPAL --- */
 .main-header {
   background-color: #ffffff;
   padding: 15px 0;
@@ -31,9 +45,9 @@ body {
 }
 
 .logo {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.5em;
-  font-weight: 700;
+  font-family: 'Permanent Marker', cursive; 
+  font-size: 1.8em;
+  font-weight: 400; 
   color: #c0392b;
   text-transform: uppercase;
   text-decoration: none;
@@ -41,13 +55,13 @@ body {
 
 .main-nav {
   display: flex;
-  gap: 40px; 
+  gap: 30px;
 }
 
 .main-nav a {
   font-family: 'Poppins', sans-serif;
-  color: #333; /* Color base de los enlaces */
-  background-color: transparent; /* Quitamos el fondo de botón */
+  color: #333;
+  background-color: transparent;
   text-decoration: none;
   padding: 8px 12px;
   border-radius: 6px;
@@ -61,196 +75,45 @@ body {
   background-color: #fdf2f2;
 }
 
-/* --- Sección Principal (Hero) --- */
-.hero {
-  padding: 150px 0; /* <-- Aumentamos el espacio vertical */
-  background: radial-gradient(circle, #d64434, #c0392b);
-  text-align: center;
-  transition: padding 0.3s ease; /* Transición suave para responsividad */
-}
 
-.welcome-card {
-  background-color: rgba(255, 255, 255, 0.95);
-  border: 3px solid #c0392b;
-  border-radius: 15px;
+/* --- PANELES PRIVADOS (DASHBOARDS) --- */
+.dashboard-layout {
   display: flex;
-  align-items: center;
-  padding: 70px; /* <-- Más espacio interno */
-  max-width: 1200px; /* <-- Hacemos la tarjeta más ancha */
-  margin: auto;
-  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+  gap: 30px;
+  margin-top: 30px;
+  align-items: flex-start;
 }
 
-.welcome-logo {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 2px solid #d64434;
-  padding-right: 40px;
-  margin-right: 40px;
+.admin-sidebar,
+.dashboard-main-content {
+  background-color: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.welcome-logo img {
-  max-width: 150px;
-  border-radius: 50%;
-}
-      
-.karate-kanji {
-  font-size: 5em;
-  color: #000000;
-  writing-mode: vertical-rl;
-  margin-right: 20px;
+.admin-sidebar {
+  flex: 0 0 220px;
+  padding: 15px;
 }
 
-.welcome-text {
-  flex: 2;
-  text-align: left;
+.dashboard-main-content {
+  flex-grow: 1;
+  padding: 25px;
 }
 
-.welcome-text .subtitle {
-  font-size: 1.2em;
-  color: #555;
-  margin: 0;
-}
-
-.welcome-text h1 {
-  font-size: 5em; /* <-- Título más grande y llamativo */
-  color: #c0392b;
-  margin: 10px 0;
-}
-
-
-.btn {
-  text-decoration: none;
-  border: none;
-  border-radius: 25px;
-  padding: 15px 35px;
-  font-size: 1.1em;
-  font-weight: bold;
-  cursor: pointer;
-  margin-right: 15px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: inline-block;
-}
-      
-.btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.btn-primary {
-  background-color: #d64434;
-  color: white;
-}
-
-.btn-secondary {
-  background-color: #fff;
-  color: #d64434;
-  border: 2px solid #d64434;
-}
-
-/* --- Sección de Contacto --- */
-.contact-section {
-  padding: 50px 0;
-  text-align: center;
-  background-color: #fff;
-}
-
-
-.contact-section h2 {
+.dashboard-main-content h3 {
   font-family: 'Poppins', sans-serif;
-  font-size: 2em; /* Título más pequeño */
-  color: #c0392b;
-  margin-bottom: 8px;
-}
-
-.contact-section p {
-  font-family: 'Poppins', sans-serif;
-  font-size: 1em; /* Subtítulo más pequeño */
-  color: #666;
-  margin-bottom: 25px;
-}
-
-.contact-form {
-  max-width: 350px; /* <-- Reducimos el ancho máximo del formulario */
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  padding: 12px; /* Menos padding interno */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.95em;
-  font-family: 'Poppins', sans-serif;
-}
-
-.contact-form input:focus,
-.contact-form textarea:focus {
-  outline: none;
-  border-color: #d64434;
-  box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
-}
-/* --- Estilos para Formulario de Registro --- */
-.form-step-indicator {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  color: #6c757d;
+  margin-top: 0;
   margin-bottom: 20px;
-  text-align: center;
-  width: 100%;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 10px;
 }
 
-.form-row {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
-
-.form-row input {
-  width: 100%;
-}
-
-/* --- Footer --- */
-.main-footer {
-  background-color: #f8f9fa; /* Un color de fondo más suave */
-  color: #495057;
-  padding: 25px 0;
-  border-top: 1px solid #dee2e6; /* Borde superior sutil */
-}
-      
-.footer-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-      
-.footer-content .social-icons {
-  font-size: 1.8em;
-  display: flex;
-  gap: 15px; /* Espacio entre iconos */
-}
-      
-.footer-links {
-  display: flex;
-  gap: 25px; /* Espacio entre enlaces */
-}
-
-.footer-links a {
-  font-family: 'Poppins', sans-serif; /* Misma fuente que el header */
-  color: #495057;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
-}
-
-.footer-links a:hover {
-  color: #c0392b; /* Color rojo al pasar el mouse */
+.admin-form {
+  max-width: 100%;
 }
 
 /* --- Estilos para la Página RENADE --- */
@@ -312,10 +175,10 @@ body {
   margin-bottom: 10px;
 }
 
-/* --- Estilos para Páginas Genéricas --- */
+/* --- PÁGINAS GENÉRICAS Y CONTENEDORES --- */
 .page-container {
   padding: 50px 0;
-  background-color: #fff;
+  /* Se elimina el fondo de aquí para evitar conflictos */
 }
 
 .page-container h2 {
@@ -335,51 +198,152 @@ body {
   color: #666;
 }
 
-/* --- Galería de Flyers (Calendario) --- */
-.flyer-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-}
-
-.flyer-item {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+/* --- SECCIÓN PRINCIPAL (HERO) --- */
+.hero {
+  padding: 100px 0;
+  background: radial-gradient(circle, #e74c3c, #c0392b);
   text-align: center;
+  transition: padding 0.3s ease;
 }
+.welcome-card {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid #c0392b;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  padding: 50px;
+  max-width: 1000px;
+  margin: auto;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+.welcome-logo {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  border-right: 2px solid #e74c3c; padding-right: 40px; margin-right: 40px;
+}
+.welcome-logo img { max-width: 150px; border-radius: 50%; }
+.karate-kanji { font-size: 5em; color: #c0392b; writing-mode: vertical-rl; margin-right: 20px; }
+.welcome-text { flex: 2; text-align: left; }
+.welcome-text .subtitle { font-size: 1.2em; color: #555; margin: 0; }
+.welcome-text h1 { font-size: 4em; color: #c0392b; margin: 10px 0; }
+.btn { text-decoration: none; border: none; border-radius: 25px; padding: 15px 35px;
+  font-size: 1.1em; font-weight: bold; cursor: pointer; margin-right: 15px;
+  transition: transform 0.2s, box-shadow 0.2s; display: inline-block; }
+.btn:hover { transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.btn-primary { background-color: #e74c3c; color: white; }
+.btn-secondary { background-color: #fff; color: #e74c3c; border: 2px solid #e74c3c; }
 
-.flyer-item img {
+/* --- SECCIÓN DE CONTACTO --- */
+.contact-section { padding: 50px 0; text-align: center; background-color: #fff; }
+.contact-form { max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.contact-form input, .contact-form textarea { width: 100%; padding: 12px; border: 1px solid #ddd;
+  border-radius: 8px; font-size: 0.95em; font-family: 'Poppins', sans-serif; }
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: #e74c3c;
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
+  .contact-form {
+    max-width: 450px; 
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center; 
+  }
+
+/* --- OTROS ESTILOS DE FORMULARIOS --- */
+.form-step-indicator { font-family: 'Poppins', sans-serif; font-weight: 600; color: #6c757d;
+  margin-bottom: 20px; text-align: center; width: 100%; }
+.form-row { display: flex; gap: 12px; width: 100%; }
+.form-row input { width: 100%; }
+.contact-form select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+  font-size: 0.95em; font-family: 'Poppins', sans-serif; background-color: #fff; }
+
+/* --- FOOTER --- */
+.main-footer { background-color: #f8f9fa; color: #495057; padding: 25px 0; border-top: 1px solid #dee2e6; }
+.footer-content { display: flex; justify-content: space-between; align-items: center; }
+.footer-content .social-icons { font-size: 1.8em; display: flex; gap: 15px; }
+.footer-links { display: flex; gap: 25px; }
+.footer-links a { font-family: 'Poppins', sans-serif; color: #495057; text-decoration: none;
+  font-weight: 600; transition: color 0.3s; }
+.footer-links a:hover { color: #c0392b; }
+
+/* --- Estilos para Enlaces en Página de Login --- */
+.login-links-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1.41; /* Proporción de hoja de papel */
-  object-fit: cover;
+  max-width: 450px; /* Asegúrate que coincida con el ancho de tu formulario */
+  margin: 25px auto 0 auto;
 }
 
-.flyer-item h3 {
+.login-link {
   font-family: 'Poppins', sans-serif;
-  padding: 15px;
-  margin: 0;
+  color: #495057;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: color 0.3s;
 }
 
-/* --- Página de Ubicación --- */
-.address-text {
-  font-weight: 600;
-  font-size: 1.1em;
+.login-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
 }
 
-.map-container {
-  border: 2px solid #eee;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-top: 20px;
-}
+/* --- SIDEBARS (Comunes y Alumno/Profesor) --- */
+.sidebar-profile { text-align: center; padding: 20px 10px; border-bottom: 1px solid #dee2e6; margin-bottom: 15px; }
+.sidebar-profile .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+  border: 3px solid #c0392b; margin-bottom: 10px; }
+.sidebar-profile h4 { margin: 0 0 5px 0; font-family: 'Poppins', sans-serif; }
+.sidebar-profile span { color: #6c757d; font-size: 0.9em; font-weight: 600; }
+.admin-sidebar nav ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.sidebar-btn { width: 100%; padding: 12px 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;
+  border-radius: 6px; text-align: left; font-family: 'Poppins', sans-serif; font-weight: 600;
+  font-size: 0.95em; cursor: pointer; transition: background-color 0.3s, color 0.3s; }
+.sidebar-btn:hover { background-color: #e9ecef; }
+.sidebar-btn.active { background-color: #c0392b; color: white; border-color: #c0392b; }
+.logout-btn { width: 100%; padding: 12px 15px; margin-top: 20px; background-color: #6c757d;
+  color: white; border: 1px solid #5a6268; border-radius: 6px; text-align: center;
+  font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.95em; cursor: pointer;
+  transition: background-color 0.3s; }
+.logout-btn:hover { background-color: #5a6268; }
+
+/* --- LISTAS Y TABLAS (Pagos, Eventos, Usuarios, etc.) --- */
+.payment-table-container { overflow-x: auto; }
+.payment-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Poppins', sans-serif; }
+.payment-table th, .payment-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+.payment-table th { background-color: #f8f9fa; font-weight: 600; color: #495057; }
+.payment-table tbody tr:hover { background-color: #f1f3f5; }
+.status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+.status-paid { background-color: #28a745; }
+.status-pending { background-color: #ffc107; }
+.status-overdue { background-color: #dc3545; }
+.info-list { list-style: none; padding: 0; margin-top: 20px; }
+.info-list li { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px;
+  margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px; }
+.info-list li strong { font-weight: 600; color: #343a40; }
+.info-list li span { color: #6c757d; }
+.event-list-title { margin-top: 30px; margin-bottom: 10px; font-family: 'Poppins', sans-serif;
+  border-top: 1px solid #eee; padding-top: 20px; }
+.event-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+.event-item:last-child { border-bottom: none; }
+.event-info { display: flex; flex-direction: column; }
+.delete-btn { background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px;
+  cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; transition: background-color 0.3s; }
+.delete-btn:hover { background-color: #c82333; }
+.user-list, .event-list { list-style: none; padding: 0; margin: 0; }
+.user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+.user-list-item:last-child { border-bottom: none; }
+.user-info { display: flex; flex-direction: column; }
+.btn-edit { background-color: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 6px;
+  cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; transition: background-color 0.3s; }
+.btn-edit:hover { background-color: #0056b3; }
 
 /* --- Página Sobre Nosotros --- */
 .intro-text {
   font-size: 1.1em;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+  line-height: 1.7;
 }
 
 .divider {
@@ -420,237 +384,17 @@ body {
   color: #6c757d;
   font-weight: 600;
 }
-
-/* --- Estilos para Enlaces en Página de Login --- */
+/* --- ESTILOS PARA LOGIN ---*/
 .login-links-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px; /* Espacio entre los enlaces */
-  margin-top: 25px; /* Espacio arriba, separándolo del botón */
-}
-
-.login-link {
-  font-family: 'Poppins', sans-serif;
-  color: #495057;
-  text-decoration: none;
-  font-size: 0.9em;
-  transition: color 0.3s;
-}
-
-.login-link:hover {
-  color: #c0392b;
-  text-decoration: underline;
-}
-
-/* --- Estilos para el Dashboard de Admin --- */
-.dashboard-layout {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-  align-items: flex-start;
-}
-
-.admin-sidebar {
-  flex: 0 0 220px;
-  background-color: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 15px;
-}
-
-.admin-sidebar nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sidebar-btn {
+  flex-direction: row; /* Los pone en una fila */
+  justify-content: space-between; /* Los separa a los extremos */
   width: 100%;
-  padding: 12px 15px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  text-align: left;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 0.95em;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+  max-width: 500px; /* Ajusta al ancho del formulario */
+  margin: 25px auto 0 auto; /* Centra el contenedor */
 }
 
-.sidebar-btn:hover {
-  background-color: #e9ecef;
-}
-
-.sidebar-btn.active {
-  background-color: #c0392b;
-  color: white;
-  border-color: #c0392b;
-}
-
-.dashboard-main-content {
-  flex-grow: 1;
-  background-color: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 25px;
-}
-
-.dashboard-main-content h3 {
-  font-family: 'Poppins', sans-serif;
-  margin-top: 0;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 10px;
-}
-
-.admin-form {
-  max-width: 100%;
-}
-
-/* Estilo para los selectores en los formularios */
-.contact-form select {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 0.95em;
-  font-family: 'Poppins', sans-serif;
-  background-color: #fff;
-}
-
-
-/* --- Estilos para la Tabla de Pagos --- */
-.payment-table-container {
-  overflow-x: auto;
-}
-
-.payment-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.payment-table th, .payment-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.payment-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #495057;
-}
-
-.payment-table tbody tr:hover {
-  background-color: #f1f3f5;
-}
-
-.status-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.status-paid { background-color: #28a745; }
-.status-pending { background-color: #ffc107; }
-.status-overdue { background-color: #dc3545; }
-
-/* --- Estilos para el Gestor de Eventos --- */
-.event-list-title {
-  margin-top: 30px;
-  margin-bottom: 10px;
-  font-family: 'Poppins', sans-serif;
-  border-top: 1px solid #eee;
-  padding-top: 20px;
-}
-
-.event-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.event-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.event-item:last-child { border-bottom: none; }
-
-.event-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.event-info strong { font-weight: 600; }
-.event-info span { font-size: 0.9em; color: #6c757d; margin-top: 4px; }
-
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  transition: background-color 0.3s;
-}
-
-.delete-btn:hover { background-color: #c82333; }
-
-/* --- Estilos para la Gestión de Usuarios --- */
-.user-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-
-.user-list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.user-list-item:last-child { border-bottom: none; }
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-info strong { font-weight: 600; }
-.user-info span { font-size: 0.9em; color: #6c757d; margin-top: 4px; }
-
-.btn-edit {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  transition: background-color 0.3s;
-}
-
-.btn-edit:hover { background-color: #0056b3; }
-
-/* --- Estilos para Panel de Profesor --- */
+/* --- ESTILOS PARA PANEL DE PROFESOR (LISTA ALUMNOS) --- */
 .grado-section {
   margin-top: 30px;
 }
@@ -687,237 +431,12 @@ body {
 .asistencia-btn.falta { background-color: #dc3545; }
 .asistencia-btn.permiso { background-color: #ffc107; }
 
-/* --- Estilos para Panel de Alumno --- */
-.student-sidebar .sidebar-profile {
-  text-align: center;
-  padding: 20px 10px;
-  border-bottom: 1px solid #dee2e6;
-  margin-bottom: 15px;
-}
-
-.sidebar-profile .profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #c0392b;
-  margin-bottom: 10px;
-}
-
-.sidebar-profile h4 {
-  margin: 0 0 5px 0;
-  font-family: 'Poppins', sans-serif;
-}
-
-.sidebar-profile span {
-  color: #6c757d;
-  font-size: 0.9em;
-  font-weight: 600;
-}
-
-/* --- Estilos para la Tarjeta de Pago --- */
-.payment-card {
-  max-width: 500px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  overflow: hidden; /* para que los bordes redondeados afecten a los hijos */
-  font-family: 'Poppins', sans-serif;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-}
-
-.payment-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f8f9fa;
-  padding: 15px 20px;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.payment-card-header h4 { margin: 0; }
-.payment-card-header span { font-weight: 600; }
-
-.payment-card-body {
-  padding: 20px;
-}
-
-.payment-card-body p {
-  margin: 0 0 12px 0;
-  text-align: left;
-}
-
-.payment-card-footer {
-  padding: 15px 20px;
-  text-align: center;
-  font-weight: 700;
-  color: white;
-}
-
-.payment-card-footer.status-pagado { background-color: #28a745; }
-.payment-card-footer.status-pendiente { background-color: #ffc107; }
-.payment-card-footer.status-vencido { background-color: #dc3545; }
-
-/* --- Estilos para Vistas de Alumno --- */
-.info-list {
-  list-style: none;
-  padding: 0;
-  margin-top: 20px;
-}
-
-.info-list li {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.info-list li strong {
-  font-weight: 600;
-  color: #343a40;
-}
-
-.info-list li span {
-  color: #6c757d;
-}
-
-.admin-form label {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  color: #495057;
-  text-align: left;
-  margin-top: 10px;
-}
-/* --- Estilos para el Botón de Logout --- */
-.logout-btn {
-  width: 100%;
-  padding: 12px 15px;
-  margin-top: 20px; /* Espacio para separarlo del menú */
-  background-color: #6c757d;
-  color: white;
-  border: 1px solid #5a6268;
-  border-radius: 6px;
-  text-align: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 0.95em;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.logout-btn:hover {
-  background-color: #5a6268;
-}
-
-/* --- Estilos para el Layout y Fondo Privado --- */
-.private-layout {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  background-color: #f4f4f4; /* Un color de fondo base muy suave */
-}
-
-.private-layout::before {
-  content: '';
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 80vw;
-  max-width: 800px;
-  max-height: 800px;
-  background-image: url('./assets/images/DojoBunkai.jpg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 50%;
-  opacity: 0.15; /* <-- Un poco más visible */
-  z-index: -1;
-}
-
-/* --- Estilos para el Dashboard (CON TRANSPARENCIA) --- */
-.dashboard-layout {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-  align-items: flex-start;
-}
-
-.admin-sidebar,
-.dashboard-main-content {
-  /* --- EFECTO DE VIDRIO ESMERILADO --- */
-  background-color: rgba(255, 255, 255, 0.8); /* Fondo blanco con 80% de opacidad */
-  -webkit-backdrop-filter: blur(10px); /* Desenfoque para Safari */
-  backdrop-filter: blur(10px); /* Desenfoque estándar */
-  
-  border: 1px solid rgba(255, 255, 255, 0.4); /* Borde también semitransparente */
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidad */
-}
-
-.admin-sidebar {
-  flex: 0 0 220px;
-  padding: 15px;
-}
-
-.dashboard-main-content {
-  flex-grow: 1;
-  padding: 25px;
-}
-
-.dashboard-main-content h3 {
-  font-family: 'Poppins', sans-serif;
-  margin-top: 0;
-  margin-bottom: 20px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-  padding-bottom: 10px;
-}
-
-/* --- Diseño Responsivo para Móviles --- */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
-  .main-header .container {
-      flex-direction: column;
-      gap: 15px;
-  }
-
-  .main-nav {
-      gap: 15px;
-  }
-
-  /* La tarjeta de bienvenida se apila verticalmente */
-  .welcome-card {
-      flex-direction: column;
-      padding: 30px;
-  }
-
-  .welcome-logo {
-      border-right: none; 
-      border-bottom: 2px solid #d84c3c; 
-      padding-right: 0;
-      margin-right: 0;
-      padding-bottom: 20px;
-      margin-bottom: 20px;
-  }
-
-  .welcome-text {
-      text-align: center; 
-  }
-
-  .welcome-text h1 {
-      font-size: 2.8em;
-  }
-
-  .contact-section h2 {
-      font-size: 1.8em;
-  }
-
-  /* Ajustamos el footer para móviles */
-  .footer-content {
-      flex-direction: column;
-      gap: 20px;
-  }
-} 
+  .main-header .container, .footer-content, .dashboard-layout { flex-direction: column; gap: 15px; }
+  .welcome-card { flex-direction: column; padding: 30px; }
+  .welcome-logo { border-right: none; border-bottom: 2px solid #e74c3c; padding: 0 0 20px 0; margin: 0 0 20px 0; }
+  .welcome-text { text-align: center; }
+  .welcome-text h1 { font-size: 2.8em; }
+  .page-container h2, .contact-section h2 { font-size: 1.8em; }
+}

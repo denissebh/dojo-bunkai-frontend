@@ -8,22 +8,21 @@ function CreateProfessorForm() {
     setFormData(prevState => ({ ...prevState, [name]: value }));
   };
 
-  // --- FUNCIÓN MODIFICADA PARA LLAMAR A LA API ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Hacemos la petición POST a nuestro backend
-      const response = await fetch('http://localhost:4000/api/profesores', {
+      // --- URL CORREGIDA AQUÍ ---
+      const response = await fetch('http://localhost:4000/api/usuarios', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        // Añadimos el rol directamente aquí al enviar los datos
+        body: JSON.stringify({ ...formData, rol: 'Profesor' }),
       });
 
       if (!response.ok) {
-        // Si el servidor responde con un error, lo mostramos
         throw new Error('La respuesta del servidor no fue exitosa');
       }
 
@@ -32,7 +31,7 @@ function CreateProfessorForm() {
       alert(`¡Profesor "${nuevoProfesor.nombre}" creado exitosamente!`);
       console.log('Profesor guardado en la BD:', nuevoProfesor);
       
-      setFormData({ nombre: '', cargo: '', edad: '', grado: '' }); // Limpiar formulario
+      setFormData({ nombre: '', cargo: '', edad: '', grado: '' });
 
     } catch (error) {
       console.error('Error al crear el profesor:', error);

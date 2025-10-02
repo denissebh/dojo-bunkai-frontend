@@ -1,17 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Header from './Header';
-import Footer from './Footer';
 
 function PublicLayout() {
+  // Este layout ahora solo se encarga de renderizar las páginas públicas
   return (
-    <>
-      <Header />
-      <main>
-        <Outlet />
-      </main>
-      <Footer />
-    </>
+    <main>
+      <Outlet />
+    </main>
   );
 }
 

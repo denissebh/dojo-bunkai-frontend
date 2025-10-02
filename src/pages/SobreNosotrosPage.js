@@ -36,13 +36,13 @@ function SobreNosotrosPage() {
           </div>
           <div className="sensei-card">
             <img src={foto5} alt="Foto de Sensei 4" />
-            <h3>Juan A. Maruri Jimenez</h3>
-            <span>Sensei - 4to Dan- Director Tecnico y Juridico</span>
+            <h3>Juan A. Maruri Jiménez</h3>
+            <span>Sensei - 4to Dan- Director Técnico y Jurídico</span>
           </div>
           <div className="sensei-card">
             <img src={foto2} alt="Foto de Sensei 5" />
-            <h3>Genaro Gonzalez Carmona</h3>
-            <span>Renshi - 5to Dan - Directo Tecnico</span>
+            <h3>Genaro González Carmona</h3>
+            <span>Renshi - 5to Dan - Director Técnico</span>
           </div>
         </div>
 
