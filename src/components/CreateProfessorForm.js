@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 function CreateProfessorForm() {
-  const [formData, setFormData] = useState({ nombre: '', cargo: '', edad: '', grado: '' });
+  const [formData, setFormData] = useState({ nombre: '',apellido_paterno: '',  apellido_materno: '', cargo: '', edad: '', grado: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -12,7 +12,7 @@ function CreateProfessorForm() {
     e.preventDefault();
 
     try {
-      // --- URL CORREGIDA AQUÍ ---
+      
       const response = await fetch('http://localhost:4000/api/usuarios', {
         method: 'POST',
         headers: {

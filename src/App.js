@@ -1,10 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Importa los componentes globales
-import Header from './layouts/Header';
-import Footer from './layouts/Footer';
-
 // Importa los Layouts de ruta
 import PublicLayout from './layouts/PublicLayout';
 import PrivateLayout from './layouts/PrivateLayout';
@@ -23,9 +19,7 @@ import AlumnoDashboardPage from './pages/AlumnoDashboardPage';
 function App() {
   return (
     <BrowserRouter>
-      {/* Header y Footer ahora están fuera de las rutas, por lo que siempre serán visibles */}
-      <Header />
-
+      
       <Routes>
         {/* Rutas Públicas */}
         <Route element={<PublicLayout />}>
@@ -44,8 +38,6 @@ function App() {
           <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />
         </Route>
       </Routes>
-
-      <Footer />
     </BrowserRouter>
   );
 }

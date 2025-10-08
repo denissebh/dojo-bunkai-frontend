@@ -50,6 +50,11 @@ function AdminSidebar({ activeView, onSelectView }) {
             >
               Editar Perfiles
             </button>
+            <button className={`sidebar-btn ${activeView === 'validateRenade' ? 'active' : ''}`} onClick={() => onSelectView('validateRenade')}>Validar RENADE</button>
+  </li>
+  <li>
+    <button className={`sidebar-btn ${activeView === 'validatePayments' ? 'active' : ''}`} onClick={() => onSelectView('validatePayments')}>Validar Pagos</button>
+  
             <button onClick={handleLogout} className="logout-btn">
         Cerrar Sesión
       </button>
