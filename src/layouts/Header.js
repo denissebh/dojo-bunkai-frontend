@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom'; // <-- Importa NavLink
+import { Link, NavLink } from 'react-router-dom';
+
 
 function Header() {
   return (
@@ -16,21 +17,21 @@ function Header() {
             Inicio
           </NavLink>
           <NavLink 
-            to="/login"
-            style={({ isActive }) => ({
-              color: isActive ? '#c0392b' : '#333',
+            to="/login" 
+            style={({ isActive }) => ({ 
+              color: isActive ? '#c0392b' : '#333' 
             })}
           >
-            Login
+            Iniciar Sesión
           </NavLink>
           <NavLink 
-  to="/registro" 
-  style={({ isActive }) => ({
-    color: isActive ? '#c0392b' : '#333',
-  })}
->
-  Registro
-</NavLink>
+            to="/registro" 
+            style={({ isActive }) => ({ 
+              color: isActive ? '#c0392b' : '#333' 
+            })}
+          >
+            Registro
+          </NavLink>
         </nav>
       </div>
     </header>

@@ -1,24 +1,29 @@
 import React from 'react';
 import userAvatar from '../assets/images/alumno.jpg'; 
 import { useNavigate } from 'react-router-dom'; 
-// Ahora recibe los datos del alumno como props
+
 function AlumnoSidebar({ alumno, activeView, onSelectView }) {
   const navigate = useNavigate(); 
 
   const handleLogout = () => {
     navigate('/login');
   };
-  if (!alumno) return null; // No mostrar nada si no hay datos del alumno
+  if (!alumno) return null; 
 
   return (
     <aside className="admin-sidebar student-sidebar">
       <div className="sidebar-profile">
         <img src={userAvatar} alt="Foto de perfil del alumno" className="profile-avatar" />
-        <h4>{alumno.nombre}</h4>
+        <h4>{`${alumno.nombre || ''} ${alumno.apellido_paterno || ''} ${alumno.apellido_materno || ''}`}</h4>
         <span>{alumno.grado}</span>
       </div>
       <nav>
         <ul>
+        <li>
+            <button
+              className={`sidebar-btn ${activeView === 'miPerfil' ? 'active' : ''}`} onClick={() => onSelectView('miPerfil')}> Mi Perfil
+            </button>
+          </li>
           <li>
             <button className={`sidebar-btn ${activeView === 'pagos' ? 'active' : ''}`} onClick={() => onSelectView('pagos')}>Pagos</button>
           </li>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Importa todos los componentes
 import ProfesorSidebar from '../components/ProfesorSidebar';
 import ListaAlumnos from '../components/ListaAlumnos';
 import RenadeSection from '../components/RenadeSection';
@@ -8,42 +8,99 @@ import EstadisticasView from '../components/EstadisticasView';
 import CalendarioEventosView from '../components/CalendarioEventosView';
 import ComunicadosView from '../components/ComunicadosView';
 
-// Importa la foto de ejemplo
-import fotoProfesor from '../assets/images/Kyoshi1.jpeg';
-
-// --- DATOS DE EJEMPLO PARA EL PROFESOR "LOGUEADO" ---
-const mockProfesorLogueado = {
-  id: 101,
-  nombre: 'Francisco Barroso de Luna',
-  grado: 'Kyoshi - Fundador',
-  foto: fotoProfesor,
-  estadisticas: [
-    { torneo: 'Campeonato Mundial WUKF 2022', resultado: 'Medalla de Bronce - Kata' },
-    { torneo: 'Panamericano Shudokan 2021', resultado: 'Medalla de Oro - Kumite' }
-  ]
-};
-
-// --- DATOS DE EJEMPLO PARA EL CALENDARIO ---
-const mockEvents = [
-  { id: 1, name: 'Torneo Nacional "Copa Bunkai"', date: '2025-10-25', type: 'Torneo' },
-  { id: 2, name: 'Examen de Grado Cintas Negras', date: '2025-11-15', type: 'Examen' },
-];
+// Importa una imagen por defecto
+import fotoProfesorDefault from '../assets/images/profesor.webp';
 
 function ProfesorDashboardPage() {
   const [activeView, setActiveView] = useState('listaAlumnos');
+  const [profesorData, setProfesorData] = useState(null); 
+  const navigate = useNavigate();
+
+  // --- Función para manejar errores de autenticación ---
+  const handleAuthError = (error) => {
+    console.error("Error de autenticación:", error);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  };
+
+  useEffect(() => {
+    // Obtener datos del usuario desde localStorage
+    const storedUserData = localStorage.getItem('userData');
+    const token = localStorage.getItem('accessToken'); // Obtener token
+    
+    if (!storedUserData || !token) { // Verificar también el token
+      alert('No has iniciado sesión.');
+      navigate('/login');
+      return;
+    }
+    const userData = JSON.parse(storedUserData);
+
+    // Llamar a la API para obtener el perfil completo
+    const fetchProfesorProfile = async () => {
+      // Verificamos si hay un ID válido
+      if (!userData || !userData.id) {
+          alert('Error: Datos de sesión inválidos.');
+          navigate('/login');
+          return;
+      }
+      try {
+        const response = await fetch(`http://localhost:4000/api/usuarios/${userData.id}/profile`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+        
+
+        if (!response.ok) {
+          // --- Manejo de error de token ---
+          if (response.status === 401 || response.status === 403) {
+            return handleAuthError('Token inválido');
+          }
+          throw new Error('No se pudo cargar el perfil del profesor.');
+        }
+        const data = await response.json();
+        
+        data.foto = fotoProfesorDefault; // O data.foto = data.url_foto si lo guardas en BD
+        
+        setProfesorData(data); 
+      } catch (error) {
+        console.error("Error fetching professor profile:", error);
+        if (error.message.includes('Token inválido')) return;
+        alert('Error al cargar tu perfil.');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('accessToken');
+        navigate('/login');
+      }
+    };
+
+    fetchProfesorProfile();
+  }, []); 
 
   const renderActiveView = () => {
+    if (!profesorData) {
+      return <p>Cargando datos...</p>;
+    }
+
     switch (activeView) {
       case 'listaAlumnos':
-        return <ListaAlumnos />;
+        return <ListaAlumnos />; 
       case 'misEstadisticas':
-        return <EstadisticasView estadisticas={mockProfesorLogueado.estadisticas} />;
+        return <EstadisticasView estadisticas={profesorData.torneos || []} />; 
+    
       case 'calendario':
-        return <CalendarioEventosView events={mockEvents} />;
+        const allEvents = [
+          ...(profesorData.examenes || []),
+          ...(profesorData.torneos || []),
+          ...(profesorData.seminarios || [])
+        ];
+       return <CalendarioEventosView events={allEvents} />;
       case 'comunicados':
-        return <ComunicadosView />;
+        return <ComunicadosView />; 
       case 'renade':
-        return <RenadeSection />;
+        return <RenadeSection />; 
       default:
         return <ListaAlumnos />;
     }
@@ -52,10 +109,11 @@ function ProfesorDashboardPage() {
   return (
     <div className="page-container">
       <div className="container">
-        <h2>Panel de Profesor</h2>
+        <h2>Profesor</h2>
         <div className="dashboard-layout">
+          {}
           <ProfesorSidebar 
-            profesor={mockProfesorLogueado} 
+            profesor={profesorData} 
             activeView={activeView} 
             onSelectView={setActiveView} 
           />

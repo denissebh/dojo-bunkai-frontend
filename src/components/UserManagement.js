@@ -1,30 +1,67 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 
 function UserManagement() {
   const [users, setUsers] = useState([]); 
   const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate(); // --- NUEVO
+  const handleAuthError = (error) => {
+    console.error("Error de autenticación:", error);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return handleAuthError('No se encontró token');
+      }
+      
       try {
-        const response = await fetch('http://localhost:4000/api/usuarios');
+        const response = await fetch('http://localhost:4000/api/usuarios', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          }
+        });
+
+
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            return handleAuthError('Token inválido');
+          }
           throw new Error('No se pudo obtener la lista de usuarios.');
         }
         const data = await response.json();
         setUsers(data);
       } catch (error) {
         console.error('Error al cargar usuarios:', error);
+        if (error.message.includes('Token inválido')) return;
         alert('No se pudo cargar la lista de usuarios.');
       }
     };
     fetchUsers();
-  }, []);
-
+  
+  }, []); 
   const handleEditClick = (user) => {
     setSelectedUser(user);
-    setFormData(user);
+    setFormData({
+      nombre: user.nombre || '',
+      apellido_paterno: user.apellido_paterno || '',
+      apellido_materno: user.apellido_materno || '',
+      correo_electronico: user.correo_electronico || '',
+      telefono: user.telefono || '',
+      curp: user.curp || '',
+      fecha_nacimiento: user.fecha_nacimiento ? new Date(user.fecha_nacimiento).toISOString().split('T')[0] : '',
+      grupo_sanguineo: user.grupo_sanguineo || '',
+      alergias: user.alergias || '',
+      grado: user.grado || '',
+      edad: user.edad || '', 
+    });
   };
 
   const handleCancel = () => { setSelectedUser(null); };
@@ -34,48 +71,92 @@ function UserManagement() {
     setFormData(prevState => ({ ...prevState, [name]: value }));
   };
 
-  // --- FUNCIÓN handleSave (PARA GUARDAR CAMBIOS) ---
   const handleSave = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
 
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      return handleAuthError('No se encontró token');
+    }
+
+
+    const dataToSend = {
+      ...selectedUser,
+      nombre: formData.nombre,
+      apellido_paterno: formData.apellido_paterno,
+      apellido_materno: formData.apellido_materno,
+      correo_electronico: formData.correo_electronico,
+      telefono: formData.telefono,
+      curp: formData.curp,
+      fecha_nacimiento: formData.fecha_nacimiento,
+      grupo_sanguineo: formData.grupo_sanguineo,
+      alergias: formData.alergias,
+      grado: formData.grado,
+      edad: formData.edad ? parseInt(formData.edad) : null,
+    };
+
+    console.log("Datos que se enviarán al backend:", dataToSend);
+
     try {
       const response = await fetch(`http://localhost:4000/api/usuarios/${selectedUser.id}`, {
         method: 'PUT',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend), 
       });
 
       if (!response.ok) {
-        throw new Error('Error al guardar los cambios.');
+        if (response.status === 401 || response.status === 403) {
+          return handleAuthError('Token inválido');
+        }
+        let errorMsg = 'Error al guardar los cambios.';
+        try {
+            const errorData = await response.json();
+            errorMsg = errorData.error || errorMsg;
+        } catch(jsonError) { /* No hacer nada si no hay JSON */ }
+        throw new Error(errorMsg);
       }
-
       const updatedUser = await response.json();
 
-      setUsers(users.map(user => 
+      setUsers(users.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       ));
-      
+
       alert(`Perfil de ${updatedUser.nombre} actualizado exitosamente.`);
       setSelectedUser(null);
 
     } catch (error) {
       console.error('Error al actualizar:', error);
-      alert('Hubo un error al guardar los cambios.');
+      alert(`Hubo un error al guardar los cambios: ${error.message}`);
     }
   };
 
-  // --- FUNCIÓN handleDelete (PARA ELIMINAR USUARIOS) ---
   const handleDelete = async (userId, userName) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar a ${userName}?`)) {
+
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        return handleAuthError('No se encontró token');
+      }
+
+
       try {
         const response = await fetch(`http://localhost:4000/api/usuarios/${userId}`, {
           method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
         });
+     
 
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            return handleAuthError('Token inválido');
+          }
           throw new Error('Error al eliminar el usuario.');
         }
         

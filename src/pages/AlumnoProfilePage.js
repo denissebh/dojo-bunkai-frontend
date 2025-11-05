@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'; // <-- IMPORTANTE: Añadir useEffect
+import React, { useState, useEffect } from 'react'; // <-- Añadido useEffect
 
+// Importa todos los componentes del panel
 import AdminSidebar from '../components/AdminSidebar';
 import PaymentList from '../components/PaymentList';
 import EventCalendarManager from '../components/EventCalendarManager';
@@ -11,23 +12,23 @@ import AddExamResultView from '../components/AddExamResultView';
 import AddSeminarView from '../components/AddSeminarView';
 
 
-
-function AdminDashboardPage() { const [activeView, setActiveView] = useState('viewPayments');
-
+function AdminDashboardPage() {
+  const [activeView, setActiveView] = useState('viewPayments');
 
   const [payments, setPayments] = useState([]);
   const [isLoadingPayments, setIsLoadingPayments] = useState(true);
 
   useEffect(() => {
-    
+
     if (activeView === 'viewPayments') {
       const fetchPayments = async () => {
         setIsLoadingPayments(true);
-        const token = localStorage.getItem('accessToken'); 
+        const token = localStorage.getItem('accessToken');
         
         if (!token) {
           alert('Error de sesión. Por favor, inicia sesión de nuevo.');
           setIsLoadingPayments(false);
+          
           return;
         }
 
@@ -57,17 +58,17 @@ function AdminDashboardPage() { const [activeView, setActiveView] = useState('vi
 
       fetchPayments();
     }
-  }, [activeView]); // Se vuelve a ejecutar si cambiamos a la vista de pagos
+  }, [activeView]); 
 
 
-   const renderActiveView = () => {
-
+  const renderActiveView = () => {
+    
     // ---  Manejo de estado de carga para Pagos ---
     if (activeView === 'viewPayments' && isLoadingPayments) {
       return <p>Cargando lista de pagos...</p>;
     }
 
-     switch (activeView) {
+    switch (activeView) {
       case 'viewPayments':
         return <PaymentList payments={payments} />;
       case 'manageEvents':
@@ -75,33 +76,33 @@ function AdminDashboardPage() { const [activeView, setActiveView] = useState('vi
       case 'createProfessor':
         return <CreateProfessorForm />;
       case 'addTournamentResult':
-       return <AddTournamentResultForm />;
+        return <AddTournamentResultForm />;
       case 'addExamResult':
         return <AddExamResultView />;
       case 'addSeminarResult':
-         return <AddSeminarView />;
+        return <AddSeminarView />;
       case 'editProfiles':
-         return <UserManagement />;
+        return <UserManagement />;
       case 'validateRenade':
         return <RenadeValidationView />;
       default:
-         return <PaymentList payments={payments} />;
+        return <PaymentList payments={payments} />;
     }
   };
 
-   return (
+  return (
     <div className="page-container">
-        <div className="container">
-          <h2>Administrador</h2>
-          <div className="dashboard-layout">
+      <div className="container">
+        <h2>Administrador</h2>
+        <div className="dashboard-layout">
           <AdminSidebar activeView={activeView} onSelectView={setActiveView} />
-         <main className="dashboard-main-content">
-         {renderActiveView()}
-         </main>
-       </div>
+          <main className="dashboard-main-content">
+            {renderActiveView()}
+          </main>
+        </div>
       </div>
     </div>
- );
+  );
 }
 
 export default AdminDashboardPage;

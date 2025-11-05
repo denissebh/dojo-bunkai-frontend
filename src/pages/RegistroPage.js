@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- IMPORTA useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 function RegistroPage() {
   const [step, setStep] = useState(1);
@@ -16,7 +16,7 @@ function RegistroPage() {
     passwordConfirm: ''
   });
   
-  const navigate = useNavigate(); // Hook para redirigir
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +25,7 @@ function RegistroPage() {
 
   const nextStep = () => setStep(step + 1);
 
-  // --- FUNCIÓN handleSubmit ACTUALIZADA ---
+  // --- FUNCIÓN handleSubmit  ---
   const handleSubmit = async (e) => {
     e.preventDefault();
 

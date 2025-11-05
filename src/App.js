@@ -1,11 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// Importa los Layouts de ruta
 import PublicLayout from './layouts/PublicLayout';
-import PrivateLayout from './layouts/PrivateLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 
-// Importa todas tus páginas
+
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegistroPage from './pages/RegistroPage';
@@ -15,11 +14,12 @@ import SobreNosotrosPage from './pages/SobreNosotrosPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProfesorDashboardPage from './pages/ProfesorDashboardPage';
 import AlumnoDashboardPage from './pages/AlumnoDashboardPage';
+import AlumnoProfilePage from './pages/AlumnoProfilePage';
 
 function App() {
   return (
+  
     <BrowserRouter>
-      
       <Routes>
         {/* Rutas Públicas */}
         <Route element={<PublicLayout />}>
@@ -32,11 +32,24 @@ function App() {
         </Route>
 
         {/* Rutas Privadas */}
-        <Route element={<PrivateLayout />}>
+       {/* Rutas de Administrador */}
+       <Route element={<ProtectedRoute allowedRoles={['Administrador']} />}>
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          
+        </Route>
+
+        {/* Rutas de Profesor */}
+        <Route element={<ProtectedRoute allowedRoles={['Profesor', 'Administrador']} />}>
+          {/* Permitimos que el Admin también vea las rutas de Profesor */}
           <Route path="/profesor/dashboard" element={<ProfesorDashboardPage />} />
+          <Route path="/profesor/alumno/:alumnoId" element={<AlumnoProfilePage />} />
+        </Route>
+
+        {/* Rutas de Alumno */}
+        <Route element={<ProtectedRoute allowedRoles={['Alumno']} />}>
           <Route path="/alumno/dashboard" element={<AlumnoDashboardPage />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
   );

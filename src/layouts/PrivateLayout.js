@@ -6,7 +6,7 @@ import PrivateFooter from './PrivateFooter';
 function PrivateLayout() {
   return (
     <div className="private-layout">
-      <PrivateHeader title="Panel de Control" />
+      <PrivateHeader title="Bienvenido a Dojo Bunkai" />
       <main>
         <Outlet />
       </main>

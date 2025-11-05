@@ -18,7 +18,7 @@ function HomePage() {
             <div className="action-buttons">
             <Link to="/login" className="btn btn-primary">Iniciar sesión</Link>
             <a 
-                href="https://wa.me/5215540457814" // <-- ¡RECUERDA CAMBIAR ESTE NÚMERO!
+                href="https://wa.me/5215540457814" 
                 className="btn btn-secondary"
                 target="_blank" 
                 rel="noopener noreferrer"

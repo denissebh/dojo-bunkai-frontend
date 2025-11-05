@@ -1,4 +1,8 @@
 import React from 'react';
+const initialEvents = JSON.parse(localStorage.getItem('dojoEvents')) || [
+  { id: 1, name: 'Torneo Nacional "Copa Bunkai"', date: '2025-10-25', type: 'Torneo' },
+
+];
 
 function CalendarioEventosView({ events }) {
   return (
