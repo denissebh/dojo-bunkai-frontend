@@ -1,64 +1,45 @@
-import React, { useState, useEffect } from 'react'; 
-import { useNavigate } from 'react-router-dom'; 
+import React, { useState, useEffect, useCallback } from 'react'; 
+import { api, AuthError } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
 function AddTournamentResultForm() {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
     userId: '',
     tournamentName: '',
     category: 'kata',
     place: '1'
   });
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-
-  const handleAuthError = (error) => {
-    console.error("Error de autenticación:", error);
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
     localStorage.removeItem('userData');
     localStorage.removeItem('accessToken');
     navigate('/login');
-  };
+  }, [navigate]); 
 
-
+  //  useEffect
   useEffect(() => {
     const fetchUsers = async () => {
-      
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        return handleAuthError('No se encontró token');
-      }
-     
-
       try {
-        const response = await fetch('http://localhost:4000/api/usuarios', {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-          }
-        });
-       
-
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            return handleAuthError('Token inválido');
-          }
-          throw new Error('No se pudo cargar la lista de usuarios');
-        }
-
-        const data = await response.json();
+        const data = await api.get('/usuarios');
         setUsers(data.filter(u => u.rol === 'Alumno' || u.rol === 'Profesor'));
+
       } catch (error) {
-        console.error("Error fetching users:", error);
-        if (error.message.includes('Token inválido')) return;
-        alert('No se pudo cargar la lista de usuarios.');
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error("Error fetching users:", error);
+          alert(`No se pudo cargar la lista de usuarios: ${error.message}`);
+        }
       }
     };
     fetchUsers();
   
-  }, []);
-
-
+  }, [handleAuthError]); 
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -67,15 +48,9 @@ function AddTournamentResultForm() {
     }));
   };
 
+  // handleSubmit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      return handleAuthError('No se encontró token');
-    }
-    
-
     const dataToSend = {
         id_usuario: formData.userId,
         tipo_evento: 'Torneo',
@@ -88,33 +63,21 @@ function AddTournamentResultForm() {
     console.log("Enviando datos de torneo:", dataToSend); 
 
     try {
-       
-        const response = await fetch('http://localhost:4000/api/seguimiento/torneos', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}` // <-- El "pase"
-            },
-            body: JSON.stringify(dataToSend)
-        });
-        
+      const savedResult = await api.post('/seguimiento/torneos', dataToSend);
+      
+      console.log('Resultado guardado:', savedResult);
+      alert('Resultado de torneo guardado exitosamente.');
 
-        if (!response.ok) {
-            if (response.status === 401 || response.status === 403) {
-              return handleAuthError('Token inválido');
-            }
-            throw new Error('Error al guardar el resultado del torneo.');
-        }
-
-        const savedResult = await response.json();
-        console.log('Resultado guardado:', savedResult);
-        alert('Resultado de torneo guardado exitosamente.');
-
-        setFormData({ userId: '', tournamentName: '', category: 'kata', place: '1' });
+      setFormData({ userId: '', tournamentName: '', category: 'kata', place: '1' });
 
     } catch(error) {
+  
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
         console.error("Error guardando torneo:", error);
-        alert('Hubo un error al guardar el resultado.');
+        alert(`Hubo un error al guardar el resultado: ${error.message}`);
+      }
     }
   };
 

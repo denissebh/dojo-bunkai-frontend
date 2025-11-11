@@ -12,7 +12,7 @@ function MiPerfilView({ alumno, onEditClick }) {
         <p><strong>ID:</strong> {alumno.id}</p>
         <p><strong>Nombre Completo:</strong> {`${alumno.nombre || ''} ${alumno.apellido_paterno || ''} ${alumno.apellido_materno || ''}`}</p>
         <p><strong>Grado:</strong> {alumno.grado}</p>
-        <p><strong>Correo Electrónico:</strong> {alumno.email || 'No especificado'}</p>
+        <p><strong>Correo Electrónico:</strong> {alumno.correo_electronico || 'No especificado'}</p>
         <p><strong>Teléfono:</strong> {alumno.telefono || 'No especificado'}</p>
         <p><strong>Fecha de Nacimiento:</strong> {formatDate(alumno.fecha_nacimiento)}</p>
         <p><strong>Edad:</strong> {alumno.edad || 'No especificada'}</p>

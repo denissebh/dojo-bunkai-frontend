@@ -8,7 +8,9 @@ function SeminariosView({ seminarios }) {
         {seminarios.length > 0 ? (
           seminarios.map(seminario => (
             <li key={seminario.id}>
-              <strong>{seminario.nombre} ({seminario.fecha})</strong>
+              <strong>{seminario.descripcion} 
+              ({new Date (seminario.fecha).toLocaleDateString()})
+              </strong>
               <span>Ponente: {seminario.ponente}</span>
             </li>
           ))

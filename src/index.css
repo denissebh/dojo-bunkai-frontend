@@ -2,11 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Poppins:wght@400;600;700&display=swap');
 
 /* --- ESTILOS GENERALES --- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%; 
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
   background-color: #f9f9f9;
   color: #333;
+  font-size: 1rem; 
+  line-height: 1.6; 
 }
 
 .container {
@@ -235,10 +246,6 @@ body {
 /* --- SECCIÓN DE CONTACTO --- */
 .contact-section { padding: 50px 0; text-align: center; background-color: #fff; }
 .contact-form { max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
-.contact-form input, .contact-form textarea { width: 100%; padding: 12px; border: 1px solid #ddd;
-  border-radius: 8px; font-size: 0.95em; font-family: 'Poppins', sans-serif; }
-.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: #e74c3c;
-  box-shadow: 0 0 5px rgba(231, 76, 60, 0.3); }
   .contact-form {
     max-width: 450px; 
     margin: 0 auto;
@@ -251,10 +258,6 @@ body {
 /* --- OTROS ESTILOS DE FORMULARIOS --- */
 .form-step-indicator { font-family: 'Poppins', sans-serif; font-weight: 600; color: #6c757d;
   margin-bottom: 20px; text-align: center; width: 100%; }
-.form-row { display: flex; gap: 12px; width: 100%; }
-.form-row input { flex: 1; }
-.contact-form select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
-  font-size: 0.95em; font-family: 'Poppins', sans-serif; background-color: #fff; }
 
 /* --- FOOTER --- */
 .main-footer { background-color: #f8f9fa; color: #495057; padding: 25px 0; border-top: 1px solid #dee2e6; }
@@ -339,7 +342,7 @@ body {
 
 /* --- Página Sobre Nosotros --- */
 .intro-text {
-  font-size: 1.1em;
+  font-size: 1.1rem;
   text-align: center;
   max-width: 800px;
   margin: 0 auto 30px auto;
@@ -356,7 +359,7 @@ body {
 
 .sensei-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 30px;
   margin-top: 40px;
 }
@@ -431,15 +434,72 @@ body {
 .asistencia-btn.falta { background-color: #dc3545; }
 .asistencia-btn.permiso { background-color: #ffc107; }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 768px) {
-  .main-header .container, .footer-content, .dashboard-layout { flex-direction: column; gap: 15px; }
-  .welcome-card { flex-direction: column; padding: 30px; }
-  .welcome-logo { border-right: none; border-bottom: 2px solid #e74c3c; padding: 0 0 20px 0; margin: 0 0 20px 0; }
-  .welcome-text { text-align: center; }
-  .welcome-text h1 { font-size: 2.8em; }
-  .page-container h2, .contact-section h2 { font-size: 1.8em; }
+/* ---  FORMULARIOS --- */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="number"],
+input[type="tel"],
+select,
+textarea {
+  width: 100%; /*  Ocupan el 100% de su contenedor */
+  padding: 12px; /* Tenías 12px,  */
+  border: 1px solid #ddd;
+  border-radius: 8px; 
+  font-size: 0.95em; 
+  font-family: 'Poppins', sans-serif;
+  background-color: #fff;
+  
+  box-sizing: border-box; 
 }
+
+/* Efecto de Foco (Focus) para todos los campos */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #e74c3c; 
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+}
+
+.form-group {
+  margin-bottom: 1.25rem; 
+  display: flex;
+  flex-direction: column;
+  width: 100%; /* Ocupa todo el ancho por defecto */
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600; 
+  color: #333;
+  font-size: 0.9rem;
+  text-align: left; /* Asegura que todas las etiquetas estén alineadas */
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap; /* Para que en móviles se pongan uno debajo de otro */
+  gap: 12px; 
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1; /* Cada grupo (label+input) ocupa el mismo espacio */
+  margin-bottom: 0; /* El .form-row ya maneja el espacio */
+ 
+  min-width: 150px; 
+}
+
+
 
 /* --- Header Privado --- */
 .private-header {
@@ -664,3 +724,236 @@ body {
 .btn-delete-payment:hover {
   opacity: 0.8;
 }
+/* --- ESTILOS PARA LA PÁGINA DE PERFIL DE ALUMNO --- */
+
+/* Contenedor principal de la página. 
+   Usamos el .container que ya definimos en el JS. */
+   .container {
+    max-width: 960px; /* Ancho máximo para el contenido */
+    margin: 2rem auto; /* Centra la página y da espacio superior/inferior */
+    padding: 0 1rem;   /* Espacio en los lados en móviles */
+  }
+  
+  /* Tarjeta base: la usaremos para la info principal y cada sección */
+  .profile-card,
+  .profile-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Título principal de la página (ej: "Perfil de Damian Hernández") */
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 2rem;
+  }
+  
+  /* Títulos de cada sección (ej: "Información Principal", "Historial de Pagos") */
+  h3 {
+    color: #b90000; /* Un rojo oscuro para coincidir con tu barra de navegación */
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+  }
+  
+  /* Estilos para los párrafos de la tarjeta de información principal */
+  .profile-card p {
+    margin: 0.75rem 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .profile-card p strong {
+    color: #333;
+    margin-right: 8px;
+    font-weight: 600;
+  }
+  
+  /* --- ESTILOS PARA LAS TABLAS --- */
+  
+  /* Hacemos que la sección sea "responsive"
+     Si la tabla es muy ancha, aparecerá un scroll horizontal */
+  .profile-section {
+    overflow-x: auto;
+  }
+  
+  /* Clase genérica para todas las tablas del perfil */
+  .profile-table {
+    width: 100%;
+    border-collapse: collapse; /* Quita dobles bordes */
+    margin-top: 1rem;
+    min-width: 600px; /* Ancho mínimo para que no se comprima demasiado */
+  }
+  
+  .profile-table th,
+  .profile-table td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #ddd;
+    text-align: left; /* Alinea todo a la izquierda */
+    vertical-align: middle;
+  }
+  
+  /* Cabecera de la tabla (th) */
+  .profile-table th {
+    background-color: #f9f9f9;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Filas de la tabla (tbody) */
+  .profile-table tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  /* Mensajes de error o "no hay datos" */
+  .profile-section p {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  /* Estilos para el mensaje de error principal */
+  .error-message {
+    color: #D8000C;
+    background-color: #FFD2D2;
+    border: 1px solid #D8000C;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+  }
+  
+  /*respositive*/
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+  }
+
+  .welcome-card {
+    padding: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* HEADER */
+  .main-header .container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .main-nav {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .main-nav a {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* HERO */
+  .welcome-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome-logo {
+    border-right: none;
+    border-bottom: 2px solid var(--color-secundario);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .welcome-text {
+    text-align: center;
+  }
+
+  .welcome-text h1 {
+    font-size: 2.4em;
+  }
+
+  /* FORMULARIOS */
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-row .form-group {
+    width: 100%;
+  }
+
+  /* SIDEBAR */
+  .admin-sidebar {
+    width: 100%;
+  }
+
+  /* TABLAS */
+  .payment-table td,
+  .payment-table th {
+    font-size: 0.85em;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .welcome-text h1 {
+    font-size: 2em;
+  }
+
+  /* Botones grandes en móvil */
+  .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  /* Mejor lectura en pantallas muy pequeñas */
+  input, select, textarea {
+    font-size: 1em;
+  }
+}
+.header-inner {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.public-main {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Centra el contenido del hero */
+.hero-inner {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .welcome-card {
+    margin: 0 10px;
+    width: calc(100% - 20px);
+  }
+}
+
+
+

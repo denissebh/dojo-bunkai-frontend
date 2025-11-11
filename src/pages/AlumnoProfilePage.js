@@ -1,108 +1,179 @@
-import React, { useState, useEffect } from 'react'; // <-- Añadido useEffect
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api'; 
 
-// Importa todos los componentes del panel
-import AdminSidebar from '../components/AdminSidebar';
-import PaymentList from '../components/PaymentList';
-import EventCalendarManager from '../components/EventCalendarManager';
-import CreateProfessorForm from '../components/CreateProfessorForm';
-import AddTournamentResultForm from '../components/AddTournamentResultForm';
-import UserManagement from '../components/UserManagement';
-import RenadeValidationView from '../components/RenadeValidationView';
-import AddExamResultView from '../components/AddExamResultView';
-import AddSeminarView from '../components/AddSeminarView';
+function AlumnoProfilePage() {
+  const { alumnoId } = useParams();
+  const navigate = useNavigate(); // 4. Preparamos useNavigate
 
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  }, [navigate]);
 
-function AdminDashboardPage() {
-  const [activeView, setActiveView] = useState('viewPayments');
-
-  const [payments, setPayments] = useState([]);
-  const [isLoadingPayments, setIsLoadingPayments] = useState(true);
-
-  useEffect(() => {
-
-    if (activeView === 'viewPayments') {
-      const fetchPayments = async () => {
-        setIsLoadingPayments(true);
-        const token = localStorage.getItem('accessToken');
-        
-        if (!token) {
-          alert('Error de sesión. Por favor, inicia sesión de nuevo.');
-          setIsLoadingPayments(false);
-          
-          return;
-        }
-
-        try {
-          // Usamos el endpoint '/api/pagos' de  API Gateway
-          const response = await fetch('http://localhost:4000/api/pagos', {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (!response.ok) {
-            throw new Error('Error al cargar la lista de pagos');
-          }
-
-          const data = await response.json();
-          setPayments(data); 
-
-        } catch (error) {
-          console.error("Error fetching payments:", error);
-          alert('No se pudo cargar la lista de pagos.');
-        } finally {
-          setIsLoadingPayments(false);
-        }
-      };
-
-      fetchPayments();
-    }
-  }, [activeView]); 
-
-
-  const renderActiveView = () => {
-    
-    // ---  Manejo de estado de carga para Pagos ---
-    if (activeView === 'viewPayments' && isLoadingPayments) {
-      return <p>Cargando lista de pagos...</p>;
-    }
-
-    switch (activeView) {
-      case 'viewPayments':
-        return <PaymentList payments={payments} />;
-      case 'manageEvents':
-        return <EventCalendarManager />;
-      case 'createProfessor':
-        return <CreateProfessorForm />;
-      case 'addTournamentResult':
-        return <AddTournamentResultForm />;
-      case 'addExamResult':
-        return <AddExamResultView />;
-      case 'addSeminarResult':
-        return <AddSeminarView />;
-      case 'editProfiles':
-        return <UserManagement />;
-      case 'validateRenade':
-        return <RenadeValidationView />;
-      default:
-        return <PaymentList payments={payments} />;
-    }
+  const handleGoBack = () => {
+    navigate('/profesor/dashboard'); 
   };
 
-  return (
-    <div className="page-container">
-      <div className="container">
-        <h2>Administrador</h2>
-        <div className="dashboard-layout">
-          <AdminSidebar activeView={activeView} onSelectView={setActiveView} />
-          <main className="dashboard-main-content">
-            {renderActiveView()}
-          </main>
-        </div>
+  useEffect(() => {
+    const fetchAlumnoProfile = async () => {
+      setIsLoading(true);
+      setError(null);      
+      try {
+        const data = await api.get(`/usuarios/${alumnoId}/profile`);
+        setProfile(data); // Guardamos el objeto completo
+
+      } catch (err) {
+        console.error("Error al buscar el perfil del alumno:", err);
+        if (err instanceof AuthError) {
+          handleAuthError(err.message);
+        } else {
+          setError(err.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAlumnoProfile();
+    
+  }, [alumnoId, handleAuthError]); 
+
+  if (isLoading) {
+    return <div className="container"><p>Cargando perfil del alumno...</p></div>;
+  }
+
+  if (error) {
+    return (
+      <div className="container error-message">
+        <p>Error: {error}</p>
+        <button onClick={handleGoBack} className="btn btn-secondary" style={{ marginTop: '20px' }}>
+          &larr; Regresar
+        </button>
       </div>
+    );
+  }
+
+  if (!profile) {
+    return <div className="container"><p>No se encontró el alumno.</p></div>;
+  }
+
+
+  return (
+    <div className="container">
+      <button 
+        onClick={handleGoBack} 
+        className="btn btn-secondary" 
+        style={{ marginBottom: '20px', alignSelf: 'flex-start' }}
+      >
+        &larr; Regresar a la Lista de Alumnos
+      </button>
+
+      <h2>Perfil de {profile.nombre} {profile.apellido_paterno}</h2>
+      <div className="profile-card">
+        <h3>Información Principal</h3>
+        <p><strong>ID Alumno:</strong> {profile.id}</p> 
+        <p><strong>Email:</strong> {profile.correo_electronico}</p>
+        <p><strong>Grado (Cinturón):</strong> {profile.grado || 'N/A'}</p>
+        <p><strong>Teléfono:</strong> {profile.telefono || 'N/A'}</p>
+        <p><strong>CURP:</strong> {profile.curp || 'N/A'}</p>
+        <p><strong>Alergias:</strong> {profile.alergias || 'Ninguna'}</p>
+      </div>
+
+      <div className="profile-section">
+        <h3>Historial de Pagos</h3>
+        {profile.pagos && profile.pagos.length > 0 ? (
+          <table className="payment-table">
+            <thead>
+              <tr>
+                <th>Concepto</th>
+                <th>Monto</th>
+                <th>Tipo de Pago</th>
+                <th>Fecha de Vencimiento</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profile.pagos.map((pago) => (
+                <tr key={pago.id}> 
+                  <td>{pago.concepto}</td>
+                  <td>${pago.monto || 'N/A'}</td> {/* ⚠️ ¡Ver nota abajo! */}
+                  <td>{pago.tipo_pago}</td>
+                  <td>{new Date(pago.fecha_vencimiento).toLocaleDateString()}</td>
+                  <td>{pago.estatus_pago}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Este alumno no tiene pagos registrados.</p>
+        )}
+      </div>
+      
+      {/* Sección de Exámenes (sin cambios) */}
+      <div className="profile-section">
+        <h3>Exámenes de Grado</h3>
+        {profile.examenes && profile.examenes.length > 0 ? (
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Grado Alcanzado (Descripción)</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profile.examenes.map((ex) => (
+                <tr key={ex.id}>
+                  <td>{new Date(ex.fecha).toLocaleDateString()}</td>
+                  <td>{ex.descripcion}</td>
+                  <td>{ex.resultado}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No hay exámenes registrados.</p>
+        )}
+      </div>
+
+      {/* Sección de Torneos (sin cambios) */}
+      <div className="profile-section">
+        <h3>Torneos</h3>
+        {profile.torneos && profile.torneos.length > 0 ? (
+          <table className="results-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Nombre (Descripción)</th>
+                <th>Categoría</th>
+                <th>Resultado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {profile.torneos.map((t) => (
+                <tr key={t.id}>
+                  <td>{new Date(t.fecha).toLocaleDateString()}</td>
+                  <td>{t.descripcion}</td>
+                  <td>{t.categoria}</td>
+                  <td>{t.resultado}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No hay torneos registrados.</p>
+        )}
+      </div>
+
     </div>
   );
 }
 
-export default AdminDashboardPage;
+export default AlumnoProfilePage;

@@ -7,7 +7,7 @@ function PublicLayout() {
   return (
     <>
       <Header />
-      <main>
+      <main  className="public-main">
         <Outlet />
       </main>
       <Footer />

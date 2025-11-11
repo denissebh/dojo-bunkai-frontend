@@ -1,52 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useState, useEffect, useCallback } from 'react'; 
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api'; 
 
 function UserManagement() {
-  const [users, setUsers] = useState([]); 
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({});
-  const navigate = useNavigate(); // --- NUEVO
-  const handleAuthError = (error) => {
-    console.error("Error de autenticación:", error);
+  const navigate = useNavigate();
+
+  
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
     localStorage.removeItem('userData');
     localStorage.removeItem('accessToken');
     navigate('/login');
-  };
+  }, [navigate]); 
 
+  //  useEffect (fetchUsers)
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        return handleAuthError('No se encontró token');
-      }
-      
       try {
-        const response = await fetch('http://localhost:4000/api/usuarios', {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-          }
-        });
-
-
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            return handleAuthError('Token inválido');
-          }
-          throw new Error('No se pudo obtener la lista de usuarios.');
-        }
-        const data = await response.json();
+        const data = await api.get('/usuarios');
         setUsers(data);
       } catch (error) {
-        console.error('Error al cargar usuarios:', error);
-        if (error.message.includes('Token inválido')) return;
-        alert('No se pudo cargar la lista de usuarios.');
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error('Error al cargar usuarios:', error);
+          alert(`No se pudo cargar la lista de usuarios: ${error.message}`);
+        }
       }
     };
     fetchUsers();
   
-  }, []); 
+  }, [handleAuthError]); 
+
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setFormData({
@@ -63,23 +52,17 @@ function UserManagement() {
       edad: user.edad || '', 
     });
   };
-
   const handleCancel = () => { setSelectedUser(null); };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
   };
 
+
+  //  handleSave
   const handleSave = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
-
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      return handleAuthError('No se encontró token');
-    }
-
 
     const dataToSend = {
       ...selectedUser,
@@ -96,31 +79,10 @@ function UserManagement() {
       edad: formData.edad ? parseInt(formData.edad) : null,
     };
 
-    console.log("Datos que se enviarán al backend:", dataToSend);
-
     try {
-      const response = await fetch(`http://localhost:4000/api/usuarios/${selectedUser.id}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify(dataToSend), 
-      });
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          return handleAuthError('Token inválido');
-        }
-        let errorMsg = 'Error al guardar los cambios.';
-        try {
-            const errorData = await response.json();
-            errorMsg = errorData.error || errorMsg;
-        } catch(jsonError) { /* No hacer nada si no hay JSON */ }
-        throw new Error(errorMsg);
-      }
-      const updatedUser = await response.json();
-
+  
+      const updatedUser = await api.put(`/usuarios/${selectedUser.id}`, dataToSend);
+      
       setUsers(users.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       ));
@@ -129,48 +91,35 @@ function UserManagement() {
       setSelectedUser(null);
 
     } catch (error) {
-      console.error('Error al actualizar:', error);
-      alert(`Hubo un error al guardar los cambios: ${error.message}`);
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al actualizar:', error);
+        alert(`Hubo un error al guardar los cambios: ${error.message}`);
+      }
     }
   };
 
+  //  handleDelete
   const handleDelete = async (userId, userName) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar a ${userName}?`)) {
-
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        return handleAuthError('No se encontró token');
-      }
-
-
       try {
-        const response = await fetch(`http://localhost:4000/api/usuarios/${userId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-     
-
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            return handleAuthError('Token inválido');
-          }
-          throw new Error('Error al eliminar el usuario.');
-        }
+        await api.delete(`/usuarios/${userId}`);
         
         setUsers(users.filter(user => user.id !== userId));
         alert('Usuario eliminado exitosamente.');
 
       } catch (error) {
-        console.error('Error al eliminar:', error);
-        alert('Hubo un error al eliminar el usuario.');
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error('Error al eliminar:', error);
+          alert(`Hubo un error al eliminar el usuario: ${error.message}`);
+        }
       }
     }
   };
   
-  // --- VISTA DE LA LISTA DE USUARIOS ---
   if (!selectedUser) {
     return (
       <div>
@@ -197,7 +146,6 @@ function UserManagement() {
     );
   }
 
-  // --- VISTA DEL FORMULARIO DE EDICIÓN ---
   return (
     <div>
       <h3>Editando Perfil de: {selectedUser.nombre}</h3>

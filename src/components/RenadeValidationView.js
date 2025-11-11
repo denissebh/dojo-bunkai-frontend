@@ -1,56 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useState, useEffect, useCallback } from 'react'; 
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api'; 
 
 function RenadeValidationView() {
   const [pendingRenades, setPendingRenades] = useState([]);
-  const navigate = useNavigate(); // --- NUEVO
+  const navigate = useNavigate();
 
-
-  const handleAuthError = (error) => {
-    console.error("Error de autenticación:", error);
+  // 3. Envolvemos handleAuthError en useCallback
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
     localStorage.removeItem('userData');
     localStorage.removeItem('accessToken');
     navigate('/login');
-  };
+  }, [navigate]); 
 
-  // Función para cargar las solicitudes pendientes
-  const fetchPendingRenades = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      return handleAuthError('No se encontró token');
-    }
- 
-
+  const fetchPendingRenades = useCallback(async () => {
+  
     try {
-      const response = await fetch('http://localhost:4000/api/documentos/renade/pendientes', {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        }
-      });
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          return handleAuthError('Token inválido');
-        }
-        throw new Error('No se pudo cargar la lista.');
-      }
-      const data = await response.json();
+      const data = await api.get('/documentos/renade/pendientes');
       setPendingRenades(data);
     } catch (error) {
-      console.error("Error fetching pending RENADE:", error);
-      if (error.message.includes('Token inválido')) return;
-      alert('Error al cargar solicitudes pendientes.');
+      
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error("Error fetching pending RENADE:", error);
+        alert(`Error al cargar solicitudes pendientes: ${error.message}`);
+      }
     }
-  };
-
+  }, [handleAuthError]);
   useEffect(() => {
     fetchPendingRenades();
+  }, [fetchPendingRenades]); 
 
-  }, []);
-
-  // Función para aprobar o rechazar
+  // handleValidation
   const handleValidation = async (requestId, nuevoEstado) => {
     let motivoRechazo = '';
     if (nuevoEstado === 'Rechazado') {
@@ -60,34 +44,24 @@ function RenadeValidationView() {
         return; 
       }
     }
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      return handleAuthError('No se encontró token');
-    }
+
 
     try {
-      const response = await fetch(`http://localhost:4000/api/documentos/renade/${requestId}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ nuevoEstado, motivoRechazo })
+      await api.put(`/documentos/renade/${requestId}`, { 
+        nuevoEstado, 
+        motivoRechazo 
       });
 
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          return handleAuthError('Token inválido');
-        }
-        throw new Error(`Error al ${nuevoEstado === 'Validado' ? 'aprobar' : 'rechazar'}.`);
-      }
-
       alert(`Solicitud ${nuevoEstado.toLowerCase()}a exitosamente.`);
-      fetchPendingRenades();
+      fetchPendingRenades(); // Recargamos la lista
 
     } catch (error) {
-      console.error("Error validating RENADE:", error);
-      alert(`Hubo un error al ${nuevoEstado === 'Validado' ? 'aprobar' : 'rechazar'} la solicitud.`);
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error("Error validating RENADE:", error);
+        alert(`Hubo un error al ${nuevoEstado === 'Validado' ? 'aprobar' : 'rechazar'} la solicitud: ${error.message}`);
+      }
     }
   };
 

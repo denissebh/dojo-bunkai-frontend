@@ -1,57 +1,37 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api'; 
 
 const kyuGrades = ['10mo Kyu', '9no Kyu', '8vo Kyu', '7mo Kyu', '6to Kyu', '5to Kyu', '4to Kyu', '3er Kyu', '2do Kyu', '1er Kyu'];
 const danGrades = ['1er Dan', '2do Dan', '3er Dan', '4to Dan', '5to Dan', '6to Dan', '7mo Dan', '8vo Dan', '9no Dan', '10mo Dan'];
 
 function AddExamResultView() {
-  // --- Estados para los datos de la API ---
   const [students, setStudents] = useState([]);
   const [professors, setProfessors] = useState([]);
   const [isLoading, setIsLoading] = useState(true); 
-
-
+  
   const [selectedUserType, setSelectedUserType] = useState('alumno');
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedGrade, setSelectedGrade] = useState(''); 
   const [examDate, setExamDate] = useState('');
   const [result, setResult] = useState('Aprobado');
   const [puntuacion, setPuntuacion] = useState(''); 
+  
+  const navigate = useNavigate(); 
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  }, [navigate]);
 
- 
+  //  useEffect
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
-
-      // Obtenemos el token (usando 'accessToken')
-      const token = localStorage.getItem('accessToken'); 
-
-      if (!token) {
-        alert('Error: No se encontró sesión. Por favor, vuelve a iniciar sesión.');
-        setIsLoading(false);
-        return; 
-      }
-      
       try {
-        
-        const response = await fetch('http://localhost:4000/api/usuarios', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-             alert('Tu sesión ha expirado. Por favor, vuelve a iniciar sesión.');
-          }
-          throw new Error(`Error al cargar usuarios: ${response.statusText}`);
-        }
-        
-        const allUsers = await response.json();
-
-        // Filtramos los usuarios por ROL 
+        const allUsers = await api.get('/usuarios');
         const studentsData = allUsers.filter(user => user.rol === 'Alumno');
         const professorsData = allUsers.filter(user => user.rol === 'Profesor');
 
@@ -59,30 +39,26 @@ function AddExamResultView() {
         setProfessors(professorsData);
 
       } catch (error) {
-        console.error("Error al cargar usuarios:", error);
-        alert("No se pudo cargar la lista de usuarios. Revisa la consola.");
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error("Error al cargar usuarios:", error);
+          alert(`No se pudo cargar la lista de usuarios: ${error.message}`);
+        }
       } finally {
         setIsLoading(false); 
       }
     };
 
     fetchUsers();
-  }, []); 
-
+  }, [handleAuthError]); 
   
   const usersToList = selectedUserType === 'alumno' ? students : professors;
   const gradesToList = selectedUserType === 'alumno' ? kyuGrades : danGrades;
 
+  //  handleSubmit
   const handleSubmit = async (e) => { 
     e.preventDefault();
-    
-    // Obtenemos el token para enviar datos
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert('Error: Tu sesión ha expirado. No se puede guardar. Inicia sesión de nuevo.');
-      return;
-    }
-
     const dataToSend = { 
       userId: selectedUserId, 
       gradoAlcanzado: selectedGrade, 
@@ -92,23 +68,11 @@ function AddExamResultView() {
     };
 
     try {
-      //Hacemos POST al endpoint de seguimiento con el token
-      const response = await fetch('http://localhost:4000/api/seguimiento/examenes', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(dataToSend)
-      });
+      const savedResult = await api.post('/seguimiento/examenes', dataToSend);
 
-      if (!response.ok) throw new Error('Error al guardar el resultado.');
-
-      const savedResult = await response.json();
       console.log('Resultado de examen guardado:', savedResult);
       alert('Resultado de examen guardado exitosamente.');
       
-      // Limpiar formulario
       setSelectedUserId('');
       setSelectedGrade('');
       setExamDate('');
@@ -116,12 +80,15 @@ function AddExamResultView() {
       setPuntuacion('');
 
     } catch (error) {
-      console.error('Error al guardar examen:', error);
-      alert('Hubo un error al guardar el resultado del examen.');
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al guardar examen:', error);
+        alert(`Hubo un error al guardar el resultado: ${error.message}`);
+      }
     }
   };
 
-  // --- Renderizado del componente ---
   return (
     <div>
       <h3>Agregar Resultado de Examen</h3>

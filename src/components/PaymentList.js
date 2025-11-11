@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api'; 
 
 function PaymentList() {
   const [payments, setPayments] = useState([]);
@@ -10,83 +12,95 @@ function PaymentList() {
     fecha_vencimiento: '',
     tipo_pago: 'Efectivo'
   });
+  const navigate = useNavigate();
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  }, [navigate]);
 
-  // Función para cargar los pagos
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/pagos');
-      if (!response.ok) throw new Error('No se pudo obtener la lista de pagos.');
-      const data = await response.json();
+      const data = await api.get('/pagos');
       setPayments(data);
     } catch (error) {
-      console.error('Error al cargar pagos:', error);
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al cargar pagos:', error);
+        alert(`No se pudo cargar la lista de pagos: ${error.message}`);
+      }
     }
-  };
+  }, [handleAuthError]); 
 
   useEffect(() => {
     fetchPayments();
-  }, []);
-
+  }, [fetchPayments]); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewPayment(prevState => ({ ...prevState, [name]: value }));
   };
 
-  // Maneja el envío del formulario para crear un nuevo pago
+  //  handleSubmit (Crear Pago)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:4000/api/pagos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPayment)
-      });
-      if (!response.ok) throw new Error('Error al crear el pago.');
+      await api.post('/pagos', newPayment);
       
       alert('Pago creado exitosamente.');
       setNewPayment({ id_usuario: '', monto: '', concepto: '', estatus_pago: 'Pendiente', fecha_vencimiento: '', tipo_pago: 'Efectivo' });
-      fetchPayments(); 
+      fetchPayments(); // Recargamos la lista
     } catch (error) {
-      console.error('Error al crear el pago:', error);
-      alert('Hubo un error al crear el pago.');
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al crear el pago:', error);
+        alert(`Hubo un error al crear el pago: ${error.message}`);
+      }
     }
   };
 
-  // Función para Marcar como Pagado
+  //  handleUpdateStatus (Marcar como Pagado)
   const handleUpdateStatus = async (paymentId) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/pagos/${paymentId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ estatus_pago: 'Pagado' })
+      // Usamos api.put y guardamos la respuesta
+      const updatedPayment = await api.put(`/pagos/${paymentId}`, { 
+        estatus_pago: 'Pagado' 
       });
-      if (!response.ok) throw new Error('Error al actualizar el pago.');
       
+      // Actualizamos el estado con la respuesta del servidor 
       setPayments(payments.map(p => 
-        p.id === paymentId ? { ...p, estatus_pago: 'Pagado' } : p
+        p.id === paymentId ? { ...p, ...updatedPayment } : p
       ));
       alert('Pago marcado como Pagado.');
     } catch (error) {
-      console.error('Error al actualizar pago:', error);
-      alert('Hubo un error al actualizar el pago.');
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al actualizar pago:', error);
+        alert(`Hubo un error al actualizar el pago: ${error.message}`);
+      }
     }
   };
 
-  // Función para Eliminar Pago
+  //  handleDelete (Eliminar Pago)
   const handleDelete = async (paymentId) => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este registro de pago?')) {
       try {
-        const response = await fetch(`http://localhost:4000/api/pagos/${paymentId}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) throw new Error('Error al eliminar el pago.');
+        await api.delete(`/pagos/${paymentId}`);
 
         setPayments(payments.filter(p => p.id !== paymentId));
         alert('Pago eliminado exitosamente.');
       } catch (error) {
-        console.error('Error al eliminar pago:', error);
-        alert('Hubo un error al eliminar el pago.');
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error('Error al eliminar pago:', error);
+          alert(`Hubo un error al eliminar el pago: ${error.message}`);
+        }
       }
     }
   };

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api';
 
 function AddSeminarView() {
   const [students, setStudents] = useState([]);
@@ -11,29 +13,22 @@ function AddSeminarView() {
   const [descripcion, setDescripcion] = useState(''); 
   const [fecha, setFecha] = useState('');
   const [ponente, setPonente] = useState(''); 
+  
+  const navigate = useNavigate(); 
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
-      const token = localStorage.getItem('accessToken'); 
-
-      if (!token) {
-        alert('Error: No se encontró sesión.');
-        setIsLoading(false);
-        return; 
-      }
-      
       try {
-        const response = await fetch('http://localhost:4000/api/usuarios', {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) throw new Error('Error al cargar usuarios');
+        const allUsers = await api.get('/usuarios');
         
-        const allUsers = await response.json();
         const studentsData = allUsers.filter(user => user.rol === 'Alumno');
         const professorsData = allUsers.filter(user => user.rol === 'Profesor');
 
@@ -41,48 +36,37 @@ function AddSeminarView() {
         setProfessors(professorsData);
 
       } catch (error) {
-        console.error("Error al cargar usuarios:", error);
-        alert("No se pudo cargar la lista de usuarios.");
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error("Error al cargar usuarios:", error);
+          alert(`No se pudo cargar la lista de usuarios: ${error.message}`);
+        }
       } finally {
         setIsLoading(false); 
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [handleAuthError]); 
 
   const usersToList = selectedUserType === 'alumno' ? students : professors;
 
+  //  handleSubmit
   const handleSubmit = async (e) => { 
     e.preventDefault();
-    
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      alert('Error: Tu sesión ha expirado.');
-      return;
-    }
-
+  
     const dataToSend = { 
       id_usuario: selectedUserId,       
       tipo_evento: 'Seminario',       
       descripcion: descripcion,       
       fecha: fecha,
-      ponente: ponente                
+      ponente: ponente              
     };
 
     try {
-      const response = await fetch('http://localhost:4000/api/seguimiento/seminarios', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(dataToSend)
-      });
+      const savedResult = await api.post('/seguimiento/seminarios', dataToSend);
 
-      if (!response.ok) throw new Error('Error al guardar el seminario.');
-
-      const savedResult = await response.json();
       console.log('Resultado de seminario guardado:', savedResult);
       alert('Seminario guardado exitosamente.');
       
@@ -92,8 +76,12 @@ function AddSeminarView() {
       setPonente(''); 
 
     } catch (error) {
-      console.error('Error al guardar seminario:', error);
-      alert('Hubo un error al guardar el resultado del seminario.');
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error al guardar seminario:', error);
+        alert(`Hubo un error al guardar el resultado: ${error.message}`);
+      }
     }
   };
 
