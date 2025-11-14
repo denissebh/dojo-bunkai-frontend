@@ -8,8 +8,8 @@ function ExamenesView({ examenes }) {
         {examenes.length > 0 ? (
           examenes.map(examen => (
             <li key={examen.id}>
-              <strong>Fecha: {examen.fecha}</strong>
-              <span>Grado Alcanzado: {examen.gradoAlcanzado}</span>
+           <h4>Fecha: {new Date(examen.fecha).toLocaleDateString()}</h4>
+              <span>Grado Alcanzado: {examen.descripcion}</span>
               <span>Resultado: {examen.resultado}</span>
             </li>
           ))

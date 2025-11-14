@@ -1,13 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 function ProfesorSidebar({ profesor, activeView, onSelectView }) {
-  const navigate = useNavigate(); // 
+  const navigate = useNavigate(); 
 
   const handleLogout = () => {
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
     navigate('/login');
   };
+
   if (!profesor) return null; 
 
   return (
@@ -19,6 +21,16 @@ function ProfesorSidebar({ profesor, activeView, onSelectView }) {
       </div>
       <nav>
         <ul>
+          {/* --- NUEVO BOTÓN: MI PERFIL --- */}
+          <li>
+            <button 
+              className={`sidebar-btn ${activeView === 'miPerfil' ? 'active' : ''}`} 
+              onClick={() => onSelectView('miPerfil')}
+            >
+              Mi Perfil
+            </button>
+          </li>
+
           <li>
             <button className={`sidebar-btn ${activeView === 'listaAlumnos' ? 'active' : ''}`} onClick={() => onSelectView('listaAlumnos')}>Lista de Alumnos</button>
           </li>
@@ -35,8 +47,8 @@ function ProfesorSidebar({ profesor, activeView, onSelectView }) {
             <button className={`sidebar-btn ${activeView === 'renade' ? 'active' : ''}`} onClick={() => onSelectView('renade')}>Solicitud RENADE</button>
           </li>
           <button onClick={handleLogout} className="logout-btn">
-        Cerrar Sesión
-      </button>
+            Cerrar Sesión
+          </button>
         </ul>
       </nav>
     </aside>

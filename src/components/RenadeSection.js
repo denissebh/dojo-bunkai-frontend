@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api';
 
 // (Puedes mantener tus componentes de Icono SVG aquí si los tienes)
-const PdfIcon = () => ( <svg>...</svg> );
-const UserIcon = () => ( <svg>...</svg> );
+const PdfIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M..."></path></svg> );
+const UserIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M..."></path></svg> );
 
 function RenadeSection() {
-  const [curpDocument, setCurpDocument] = useState(null);
+  // Esta fue la línea que corregimos del typo
+  const [curpDocument, setCurpDocument] = useState(null); 
   const [photo, setPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
+  const navigate = useNavigate(); 
+
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
+    alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  }, [navigate]);
 
   const handleCurpChange = (e) => {
     if (e.target.files[0]) {
@@ -29,49 +41,35 @@ function RenadeSection() {
       return;
     }
 
-    // --- CAMBIO: Obtener el ID del usuario real desde localStorage ---
-    const storedUserData = localStorage.getItem('userData');
-    if (!storedUserData) {
-        alert('Error: No se pudo encontrar tu sesión. Por favor, inicia sesión de nuevo.');
-        return;
-    }
-    const userData = JSON.parse(storedUserData);
-    if (!userData || !userData.id) {
-        alert('Error: Datos de sesión inválidos.');
-        return;
-    }
-    // --- FIN DEL CAMBIO ---
-
     const formData = new FormData();
-    formData.append('id_usuario', userData.id); // <-- Usa el ID real
+    // Ya no es necesario adjuntar 'id_usuario'. 
+    // El backend sabrá quién eres gracias al Token JWT.
     formData.append('foto', photo);
     formData.append('curp', curpDocument);
 
     try {
-      const response = await fetch('http://localhost:4000/api/documentos/renade', {
-        method: 'POST',
-        body: formData,
-      });
+      // ESTA ES LA LÍNEA CLAVE:
+      // Usamos api.post, que SÍ envía el token
+      const data = await api.post('/documentos/renade', formData);
 
-      if (!response.ok) {
-        throw new Error('Error al enviar la solicitud.');
-      }
-
-      const data = await response.json();
       console.log('Solicitud enviada:', data);
       alert('Tu solicitud de RENADE ha sido enviada para validación.');
       
-   
       setCurpDocument(null);
       setPhoto(null);
       setPhotoPreview('');
 
     } catch (error) {
-      console.error('Error en la solicitud de RENADE:', error);
-      alert('Hubo un error al enviar tu solicitud.');
+      if (error instanceof AuthError) {
+        handleAuthError(error.message);
+      } else {
+        console.error('Error en la solicitud de RENADE:', error);
+        alert(`Hubo un error al enviar tu solicitud: ${error.message}`);
+      }
     }
   };
 
+  // --- El JSX de 'return' no cambia ---
   return (
     <div>
       <h3>Solicitud de RENADE</h3>

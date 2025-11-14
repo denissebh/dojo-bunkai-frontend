@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api, AuthError } from '../services/api';
 
 import ProfesorSidebar from '../components/ProfesorSidebar';
 import ListaAlumnos from '../components/ListaAlumnos';
@@ -8,76 +9,62 @@ import EstadisticasView from '../components/EstadisticasView';
 import CalendarioEventosView from '../components/CalendarioEventosView';
 import ComunicadosView from '../components/ComunicadosView';
 
-// Importa una imagen por defecto
+import MiPerfilView from '../components/MiPerfilView';
+import EditarDatosView from '../components/EditarDatosView';
 import fotoProfesorDefault from '../assets/images/profesor.webp';
 
 function ProfesorDashboardPage() {
-  const [activeView, setActiveView] = useState('listaAlumnos');
+  const [activeView, setActiveView] = useState('listaAlumnos'); 
   const [profesorData, setProfesorData] = useState(null); 
   const navigate = useNavigate();
 
-  // --- Función para manejar errores de autenticación ---
-  const handleAuthError = (error) => {
-    console.error("Error de autenticación:", error);
+  const handleAuthError = useCallback((errorMsg) => {
+    console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
     localStorage.removeItem('userData');
     localStorage.removeItem('accessToken');
     navigate('/login');
-  };
+  }, [navigate]);
+
 
   useEffect(() => {
-    // Obtener datos del usuario desde localStorage
-    const storedUserData = localStorage.getItem('userData');
-    const token = localStorage.getItem('accessToken'); // Obtener token
-    
-    if (!storedUserData || !token) { // Verificar también el token
-      alert('No has iniciado sesión.');
-      navigate('/login');
-      return;
-    }
-    const userData = JSON.parse(storedUserData);
-
-    // Llamar a la API para obtener el perfil completo
     const fetchProfesorProfile = async () => {
-      // Verificamos si hay un ID válido
+      const storedUserData = localStorage.getItem('userData');
+      
+      if (!storedUserData) {
+        alert('No has iniciado sesión.');
+        navigate('/login');
+        return;
+      }
+      
+      const userData = JSON.parse(storedUserData);
       if (!userData || !userData.id) {
           alert('Error: Datos de sesión inválidos.');
           navigate('/login');
           return;
       }
-      try {
-        const response = await fetch(`http://localhost:4000/api/usuarios/${userData.id}/profile`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
-          }
-        });
-        
 
-        if (!response.ok) {
-          // --- Manejo de error de token ---
-          if (response.status === 401 || response.status === 403) {
-            return handleAuthError('Token inválido');
-          }
-          throw new Error('No se pudo cargar el perfil del profesor.');
-        }
-        const data = await response.json();
+      try {
+       
+        const data = await api.get(`/usuarios/${userData.id}/profile`);
         
-        data.foto = fotoProfesorDefault; // O data.foto = data.url_foto si lo guardas en BD
+        data.foto = fotoProfesorDefault; // 
         
         setProfesorData(data); 
+
       } catch (error) {
-        console.error("Error fetching professor profile:", error);
-        if (error.message.includes('Token inválido')) return;
-        alert('Error al cargar tu perfil.');
-        localStorage.removeItem('userData');
-        localStorage.removeItem('accessToken');
-        navigate('/login');
+        if (error instanceof AuthError) {
+          handleAuthError(error.message);
+        } else {
+          console.error("Error fetching professor profile:", error);
+          alert('Error al cargar tu perfil.');
+          
+        }
       }
     };
 
     fetchProfesorProfile();
-  }, []); 
+  }, [navigate, handleAuthError]); 
 
   const renderActiveView = () => {
     if (!profesorData) {
@@ -85,11 +72,23 @@ function ProfesorDashboardPage() {
     }
 
     switch (activeView) {
+      case 'miPerfil':
+        return <MiPerfilView alumno={profesorData} onEditClick={() => setActiveView('editar')} />;
+      case 'editar':
+        return <EditarDatosView alumno={profesorData} changeView={setActiveView} />;
       case 'listaAlumnos':
         return <ListaAlumnos />; 
-      case 'misEstadisticas':
-        return <EstadisticasView estadisticas={profesorData.torneos || []} />; 
+        case 'misEstadisticas':
+          // 1. Combinamos TODO en una sola lista
+          const todasLasEstadisticas = [
+            ...(profesorData.torneos || []),
+            ...(profesorData.examenes || []),
+            ...(profesorData.seminarios || [])
+          ];
+          // 2. Ordenamos por fecha (del más reciente al más antiguo) 
+          todasLasEstadisticas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     
+          return <EstadisticasView estadisticas={todasLasEstadisticas} />;
       case 'calendario':
         const allEvents = [
           ...(profesorData.examenes || []),
@@ -102,7 +101,7 @@ function ProfesorDashboardPage() {
       case 'renade':
         return <RenadeSection />; 
       default:
-        return <ListaAlumnos />;
+        return <MiPerfilView alumno={profesorData} onEditClick={() => setActiveView('editar')} />;
     }
   };
 
@@ -111,7 +110,6 @@ function ProfesorDashboardPage() {
       <div className="container">
         <h2>Profesor</h2>
         <div className="dashboard-layout">
-          {}
           <ProfesorSidebar 
             profesor={profesorData} 
             activeView={activeView} 

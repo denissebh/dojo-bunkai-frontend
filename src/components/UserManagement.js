@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react'; 
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { api, AuthError } from '../services/api'; 
 
 function UserManagement() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); 
   const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({});
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('Alumnos'); // Estado para la pestaña activa
+  const navigate = useNavigate(); 
 
-  
   const handleAuthError = useCallback((errorMsg) => {
     console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
     localStorage.removeItem('userData');
     localStorage.removeItem('accessToken');
     navigate('/login');
-  }, [navigate]); 
+  }, [navigate]);
 
-  //  useEffect (fetchUsers)
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -33,7 +32,6 @@ function UserManagement() {
       }
     };
     fetchUsers();
-  
   }, [handleAuthError]); 
 
   const handleEditClick = (user) => {
@@ -52,37 +50,27 @@ function UserManagement() {
       edad: user.edad || '', 
     });
   };
+
   const handleCancel = () => { setSelectedUser(null); };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({ ...prevState, [name]: value }));
   };
 
-
-  //  handleSave
   const handleSave = async (e) => {
     e.preventDefault();
     if (!selectedUser) return;
 
     const dataToSend = {
       ...selectedUser,
-      nombre: formData.nombre,
-      apellido_paterno: formData.apellido_paterno,
-      apellido_materno: formData.apellido_materno,
-      correo_electronico: formData.correo_electronico,
-      telefono: formData.telefono,
-      curp: formData.curp,
-      fecha_nacimiento: formData.fecha_nacimiento,
-      grupo_sanguineo: formData.grupo_sanguineo,
-      alergias: formData.alergias,
-      grado: formData.grado,
+      ...formData,
       edad: formData.edad ? parseInt(formData.edad) : null,
     };
 
     try {
-  
       const updatedUser = await api.put(`/usuarios/${selectedUser.id}`, dataToSend);
-      
+
       setUsers(users.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       ));
@@ -100,7 +88,6 @@ function UserManagement() {
     }
   };
 
-  //  handleDelete
   const handleDelete = async (userId, userName) => {
     if (window.confirm(`¿Estás seguro de que deseas eliminar a ${userName}?`)) {
       try {
@@ -119,45 +106,104 @@ function UserManagement() {
       }
     }
   };
+
+  // --- Filtrar Usuarios por Rol ---
+  const students = users.filter(u => u.rol === 'Alumno');
+  const professors = users.filter(u => u.rol === 'Profesor' || u.rol === 'Administrador');
+
+  // --- Función Auxiliar para Renderizar la Lista ---
+  const renderUserList = (userList) => {
+    if (userList.length === 0) {
+      return <p style={{ padding: '20px', color: '#666' }}>No hay usuarios en esta categoría.</p>;
+    }
+
+    return (
+      <ul className="user-list">
+        {userList.map(user => (
+          <li key={user.id} className="user-list-item">
+            <div className="user-info">
+              <strong>{user.nombre} {user.apellido_paterno} {user.apellido_materno}</strong>
+              <span className="user-role-badge">{user.rol}</span>
+              <span style={{ fontSize: '0.9em', color: '#666' }}>
+                 {user.grado ? ` - ${user.grado}` : ''} | {user.correo_electronico}
+              </span>
+            </div>
+            <div className="user-actions">
+              <button onClick={() => handleEditClick(user)} className="btn-edit">
+                Editar
+              </button>
+              <button onClick={() => handleDelete(user.id, user.nombre)} className="btn-delete">
+                Eliminar
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    );
+  };
   
-  if (!selectedUser) {
+  // --- VISTA DE EDICIÓN  ---
+  if (selectedUser) {
     return (
       <div>
-        <h3>Lista de Usuarios</h3>
-        <ul className="user-list">
-          {users.map(user => (
-            <li key={user.id} className="user-list-item">
-              <div className="user-info">
-                <strong>{user.nombre}</strong>
-                <span>{user.rol} - {user.grado || 'N/A'}</span>
-              </div>
-              <div className="user-actions">
-                <button onClick={() => handleEditClick(user)} className="btn-edit">
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(user.id, user.nombre)} className="btn-delete">
-                  Eliminar
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <h3>Editando Perfil de: {selectedUser.nombre}</h3>
+        <form onSubmit={handleSave} className="contact-form admin-form">
+          <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} />
+          <input type="text" name="apellido_paterno" placeholder="Apellido Paterno" value={formData.apellido_paterno} onChange={handleChange} />
+          <input type="text" name="apellido_materno" placeholder="Apellido Materno" value={formData.apellido_materno} onChange={handleChange} />
+          <input type="email" name="correo_electronico" placeholder="Correo Electrónico" value={formData.correo_electronico} onChange={handleChange} />
+          <input type="text" name="grado" placeholder="Grado" value={formData.grado} onChange={handleChange} />
+          <input type="text" name="curp" placeholder="CURP" value={formData.curp} onChange={handleChange} />
+          <div className="form-row">
+            <button type="button" onClick={handleCancel} className="btn btn-secondary">Cancelar</button>
+            <button type="submit" className="btn btn-primary">Guardar Cambios</button>
+          </div>
+        </form>
       </div>
     );
   }
 
+  // --- VISTA PRINCIPAL CON PESTAÑAS ---
   return (
     <div>
-      <h3>Editando Perfil de: {selectedUser.nombre}</h3>
-      <form onSubmit={handleSave} className="contact-form admin-form">
-        <input type="text" name="nombre" placeholder="Nombre Completo" value={formData.nombre || ''} onChange={handleChange} />
-        <input type="email" name="correo_electronico" placeholder="Correo Electrónico" value={formData.correo_electronico || ''} onChange={handleChange} />
-        <input type="text" name="grado" placeholder="Grado" value={formData.grado || ''} onChange={handleChange} />
-        <div className="form-row">
-          <button type="button" onClick={handleCancel} className="btn btn-secondary">Cancelar</button>
-          <button type="submit" className="btn btn-primary">Guardar Cambios</button>
-        </div>
-      </form>
+      <h3>Gestión de Usuarios</h3>
+      
+      {/* Contenedor de Pestañas */}
+      <div className="tabs-container" style={{ marginBottom: '20px', borderBottom: '2px solid #eee' }}>
+        <button 
+          onClick={() => setActiveTab('Alumnos')}
+          style={{
+            padding: '10px 20px',
+            border: 'none',
+            background: 'none',
+            borderBottom: activeTab === 'Alumnos' ? '3px solid #D32F2F' : 'none',
+            fontWeight: activeTab === 'Alumnos' ? 'bold' : 'normal',
+            color: activeTab === 'Alumnos' ? '#D32F2F' : '#666',
+            cursor: 'pointer',
+            fontSize: '16px'
+          }}
+        >
+          Alumnos ({students.length})
+        </button>
+        <button 
+          onClick={() => setActiveTab('Profesores')}
+          style={{
+            padding: '10px 20px',
+            border: 'none',
+            background: 'none',
+            borderBottom: activeTab === 'Profesores' ? '3px solid #D32F2F' : 'none',
+            fontWeight: activeTab === 'Profesores' ? 'bold' : 'normal',
+            color: activeTab === 'Profesores' ? '#D32F2F' : '#666',
+            cursor: 'pointer',
+            fontSize: '16px',
+            marginLeft: '10px'
+          }}
+        >
+          Profesores ({professors.length})
+        </button>
+      </div>
+      {activeTab === 'Alumnos' ? renderUserList(students) : renderUserList(professors)}
+      
     </div>
   );
 }
