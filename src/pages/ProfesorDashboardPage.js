@@ -79,23 +79,15 @@ function ProfesorDashboardPage() {
       case 'listaAlumnos':
         return <ListaAlumnos />; 
         case 'misEstadisticas':
-          // 1. Combinamos TODO en una sola lista
           const todasLasEstadisticas = [
             ...(profesorData.torneos || []),
             ...(profesorData.examenes || []),
             ...(profesorData.seminarios || [])
           ];
-          // 2. Ordenamos por fecha (del más reciente al más antiguo) 
+          //Ordenamos por fecha (del más reciente al más antiguo) 
           todasLasEstadisticas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     
           return <EstadisticasView estadisticas={todasLasEstadisticas} />;
-      case 'calendario':
-        const allEvents = [
-          ...(profesorData.examenes || []),
-          ...(profesorData.torneos || []),
-          ...(profesorData.seminarios || [])
-        ];
-       return <CalendarioEventosView events={allEvents} />;
       case 'comunicados':
         return <ComunicadosView />; 
       case 'renade':

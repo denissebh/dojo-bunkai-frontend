@@ -21,7 +21,6 @@ function ProfesorSidebar({ profesor, activeView, onSelectView }) {
       </div>
       <nav>
         <ul>
-          {/* --- NUEVO BOTÓN: MI PERFIL --- */}
           <li>
             <button 
               className={`sidebar-btn ${activeView === 'miPerfil' ? 'active' : ''}`} 
@@ -36,9 +35,6 @@ function ProfesorSidebar({ profesor, activeView, onSelectView }) {
           </li>
           <li>
             <button className={`sidebar-btn ${activeView === 'misEstadisticas' ? 'active' : ''}`} onClick={() => onSelectView('misEstadisticas')}>Mis Estadísticas</button>
-          </li>
-          <li>
-            <button className={`sidebar-btn ${activeView === 'calendario' ? 'active' : ''}`} onClick={() => onSelectView('calendario')}>Calendario de Eventos</button>
           </li>
           <li>
             <button className={`sidebar-btn ${activeView === 'comunicados' ? 'active' : ''}`} onClick={() => onSelectView('comunicados')}>Comunicados</button>
