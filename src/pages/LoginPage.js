@@ -80,8 +80,8 @@ function LoginPage() {
         </form>
 
         <div className="login-links-container">
-          <Link to="/forgot-password" className="login-link">
-            No recuerdo mi contraseña
+         <Link to="/olvide-password" className="login-link">
+          No recuerdo mi contraseña
           </Link>
           <Link to="/registro" className="login-link">
             ¿Aún no tienes una cuenta? Regístrate

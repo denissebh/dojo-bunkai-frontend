@@ -15,6 +15,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProfesorDashboardPage from './pages/ProfesorDashboardPage';
 import AlumnoDashboardPage from './pages/AlumnoDashboardPage';
 import AlumnoProfilePage from './pages/AlumnoProfilePage';
+import OlvidePasswordPage from './pages/OlvidePasswordPage'; 
+import NuevoPasswordPage from './pages/NuevoPasswordPage';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/registro" element={<RegistroPage />} />
+          <Route path="/olvide-password" element={<OlvidePasswordPage />} />
+          <Route path="/reset-password/:token" element={<NuevoPasswordPage />} />
           <Route path="/calendario" element={<CalendarioPage />} />
           <Route path="/ubicacion" element={<UbicacionPage />} />
           <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />

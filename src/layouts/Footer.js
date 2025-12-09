@@ -6,8 +6,7 @@ function Footer() {
     <footer className="main-footer">
       <div className="container footer-content">
         <div className="social-icons">
-          <span>&#128241;</span>
-          <span>&#128222;</span>
+          
         </div>
         <div className="footer-links">
         <Link to="/calendario">Calendario de Actividades</Link>

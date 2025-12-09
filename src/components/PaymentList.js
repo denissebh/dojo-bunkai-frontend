@@ -4,6 +4,8 @@ import { api, AuthError } from '../services/api';
 
 function PaymentList() {
   const [payments, setPayments] = useState([]);
+  const [students, setStudents] = useState([]); // <--- 1. Estado para guardar alumnos
+  
   const [newPayment, setNewPayment] = useState({
     id_usuario: '',
     monto: '',
@@ -12,7 +14,9 @@ function PaymentList() {
     fecha_vencimiento: '',
     tipo_pago: 'Efectivo'
   });
+
   const navigate = useNavigate();
+
   const handleAuthError = useCallback((errorMsg) => {
     console.error("Error de autenticación:", errorMsg);
     alert('Tu sesión ha expirado o no tienes permisos. Por favor, inicia sesión de nuevo.');
@@ -21,6 +25,7 @@ function PaymentList() {
     navigate('/login');
   }, [navigate]);
 
+  // --- OBTENER PAGOS ---
   const fetchPayments = useCallback(async () => {
     try {
       const data = await api.get('/pagos');
@@ -30,14 +35,27 @@ function PaymentList() {
         handleAuthError(error.message);
       } else {
         console.error('Error al cargar pagos:', error);
-        alert(`No se pudo cargar la lista de pagos: ${error.message}`);
       }
     }
   }, [handleAuthError]); 
 
+  // --- OBTENER ALUMNOS (NUEVO) ---
+  const fetchStudents = useCallback(async () => {
+    try {
+      const data = await api.get('/usuarios'); // Reutilizamos tu ruta de usuarios
+      // Filtramos para que solo aparezcan los Alumnos en la lista
+      const onlyStudents = data.filter(user => user.rol === 'Alumno');
+      setStudents(onlyStudents);
+    } catch (error) {
+      console.error('Error al cargar alumnos:', error);
+    }
+  }, []);
+
+  // Cargar datos al iniciar
   useEffect(() => {
     fetchPayments();
-  }, [fetchPayments]); 
+    fetchStudents(); // <--- Llamamos a la función
+  }, [fetchPayments, fetchStudents]); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,8 +69,9 @@ function PaymentList() {
       await api.post('/pagos', newPayment);
       
       alert('Pago creado exitosamente.');
+      // Reseteamos el formulario
       setNewPayment({ id_usuario: '', monto: '', concepto: '', estatus_pago: 'Pendiente', fecha_vencimiento: '', tipo_pago: 'Efectivo' });
-      fetchPayments(); // Recargamos la lista
+      fetchPayments(); 
     } catch (error) {
       if (error instanceof AuthError) {
         handleAuthError(error.message);
@@ -66,12 +85,10 @@ function PaymentList() {
   //  handleUpdateStatus (Marcar como Pagado)
   const handleUpdateStatus = async (paymentId) => {
     try {
-      // Usamos api.put y guardamos la respuesta
       const updatedPayment = await api.put(`/pagos/${paymentId}`, { 
         estatus_pago: 'Pagado' 
       });
       
-      // Actualizamos el estado con la respuesta del servidor 
       setPayments(payments.map(p => 
         p.id === paymentId ? { ...p, ...updatedPayment } : p
       ));
@@ -91,7 +108,6 @@ function PaymentList() {
     if (window.confirm('¿Estás seguro de que deseas eliminar este registro de pago?')) {
       try {
         await api.delete(`/pagos/${paymentId}`);
-
         setPayments(payments.filter(p => p.id !== paymentId));
         alert('Pago eliminado exitosamente.');
       } catch (error) {
@@ -125,7 +141,24 @@ function PaymentList() {
       <h3>Registrar un Pago Manual</h3>
       <form onSubmit={handleSubmit} className="contact-form admin-form">
         <div className="form-row">
-          <input type="number" name="id_usuario" placeholder="ID del Alumno" value={newPayment.id_usuario} onChange={handleChange} required />
+          
+          {/* --- AQUÍ ESTÁ EL CAMBIO PRINCIPAL: SELECT EN VEZ DE INPUT --- */}
+          <select 
+            name="id_usuario" 
+            value={newPayment.id_usuario} 
+            onChange={handleChange} 
+            required
+            className="form-select" // Puedes agregar estilos si quieres
+          >
+            <option value="">-- Seleccionar Alumno --</option>
+            {students.map((student) => (
+              <option key={student.id} value={student.id}>
+                {student.nombre} {student.apellido_paterno} {student.apellido_materno || ''}
+              </option>
+            ))}
+          </select>
+          {/* ----------------------------------------------------------- */}
+
           <input type="number" name="monto" placeholder="Monto (ej. 500.00)" value={newPayment.monto} onChange={handleChange} required />
         </div>
         <input type="text" name="concepto" placeholder="Concepto (ej. Mensualidad Diciembre)" value={newPayment.concepto} onChange={handleChange} required />

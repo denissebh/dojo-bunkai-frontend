@@ -108,8 +108,8 @@ function RenadeSection() {
     return (
       <div className="renade-status-card success">
         <StatusIcon status="Validado" />
-        <h3>¡Trámite Completado!</h3>
-        <p>Tus documentos han sido aprobados correctamente.</p>
+        <h3>¡Trámite Completado en Dojo Bunkai!</h3>
+        <p>Tus documentos han sido aprobados correctamento, por favor continaa tu tramite en la pagina de la FEMEKA .</p>
       </div>
     );
   }
@@ -119,7 +119,7 @@ function RenadeSection() {
       <div className="renade-status-card warning">
         <StatusIcon status="Pendiente" />
         <h3>En Proceso de Validación</h3>
-        <p>Tus documentos están siendo revisados por un administrador.</p>
+        <p>Tus documentos están siendo revisados por el administrador.</p>
       </div>
     );
   }
@@ -139,7 +139,7 @@ function RenadeSection() {
         </div>
       )}
 
-      {status === 'Sin enviar' && <p>Sube tu fotografía y CURP para comenzar.</p>}
+      {status === 'Sin enviar' && <p>Sube tu fotografía  (JPG) y CURP (PDF) para comenzar en los formatos mencionados.</p>}
 
       <form onSubmit={handleSubmit} className="renade-form">
         <div className="file-upload-container">

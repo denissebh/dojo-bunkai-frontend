@@ -37,7 +37,6 @@ function ComunicadosView() {
 
     setLoading(true);
     try {
-      // AQUÍ ESTÁ LA CORRECCIÓN DE LA RUTA: /comunicados/enviar
       const response = await api.post('/comunicados/enviar', formData);
       
       alert(response.message || 'Comunicado enviado correctamente.');

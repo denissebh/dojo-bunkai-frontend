@@ -1,5 +1,3 @@
-// src/components/EstadisticasView.js (MEJORADO)
-
 import React from 'react';
 
 function EstadisticasView({ estadisticas }) {

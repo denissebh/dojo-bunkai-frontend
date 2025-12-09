@@ -6,7 +6,9 @@ function UserManagement() {
   const [users, setUsers] = useState([]); 
   const [selectedUser, setSelectedUser] = useState(null);
   const [formData, setFormData] = useState({});
-  const [activeTab, setActiveTab] = useState('Alumnos'); // Estado para la pestaña activa
+  const [activeTab, setActiveTab] = useState('Alumnos');
+  const [searchTerm, setSearchTerm] = useState(''); 
+  
   const navigate = useNavigate(); 
 
   const handleAuthError = useCallback((errorMsg) => {
@@ -107,14 +109,25 @@ function UserManagement() {
     }
   };
 
-  // --- Filtrar Usuarios por Rol ---
-  const students = users.filter(u => u.rol === 'Alumno');
-  const professors = users.filter(u => u.rol === 'Profesor' || u.rol === 'Administrador');
+  // ---  LÓGICA DE FILTRADO (BUSCADOR) ---
+  const filteredUsers = users.filter(user => {
+    // Unimos nombre y apellidos para buscar en todo
+    const fullName = `${user.nombre} ${user.apellido_paterno} ${user.apellido_materno || ''}`.toLowerCase();
+    // Verificamos si el texto del buscador está incluido en el nombre
+    return fullName.includes(searchTerm.toLowerCase());
+  });
+
+  // ---  SEPARACIÓN POR ROLES (Usando la lista ya filtrada) ---
+  const students = filteredUsers.filter(u => u.rol === 'Alumno');
+  const professors = filteredUsers.filter(u => u.rol === 'Profesor' || u.rol === 'Administrador');
 
   // --- Función Auxiliar para Renderizar la Lista ---
   const renderUserList = (userList) => {
     if (userList.length === 0) {
-      return <p style={{ padding: '20px', color: '#666' }}>No hay usuarios en esta categoría.</p>;
+      // Mensaje personalizado si no hay resultados en la búsqueda
+      return <p style={{ padding: '20px', color: '#666' }}>
+          {searchTerm ? 'No se encontraron usuarios con ese nombre.' : 'No hay usuarios en esta categoría.'}
+      </p>;
     }
 
     return (
@@ -163,11 +176,28 @@ function UserManagement() {
     );
   }
 
-  // --- VISTA PRINCIPAL CON PESTAÑAS ---
+  // --- VISTA PRINCIPAL ---
   return (
     <div>
       <h3>Gestión de Usuarios</h3>
       
+      {/* ---  BARRA DE BÚSQUEDA (Visual) --- */}
+      <div style={{ marginBottom: '20px' }}>
+        <input 
+            type="text" 
+            placeholder="🔍 Buscar por nombre o apellido..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                fontSize: '16px'
+            }}
+        />
+      </div>
+
       {/* Contenedor de Pestañas */}
       <div className="tabs-container" style={{ marginBottom: '20px', borderBottom: '2px solid #eee' }}>
         <button 
@@ -202,6 +232,8 @@ function UserManagement() {
           Profesores ({professors.length})
         </button>
       </div>
+      
+      {/* Renderizado de la lista (ya filtrada) */}
       {activeTab === 'Alumnos' ? renderUserList(students) : renderUserList(professors)}
       
     </div>
